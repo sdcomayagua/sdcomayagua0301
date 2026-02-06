@@ -1,20 +1,45 @@
-import { getQuery, setQuery } from "./utils/url.js";
+// js/router.js
+let suppressUrlSync = false;
 
-export const Router = {
-  onRoute: null,
+export function getQuery() {
+  const url = new URL(window.location.href);
+  const q = {};
+  for (const [k, v] of url.searchParams.entries()) q[k] = v;
+  return q;
+}
 
-  start(){
-    window.addEventListener("popstate", ()=>this.handle());
-    this.handle(true);
-  },
+export function setQuery(params, { replace = false } = {}) {
+  if (suppressUrlSync) return;
 
-  handle(replace=false){
-    const q = getQuery();
-    this.onRoute?.(q, { replace });
-  },
+  const url = new URL(window.location.href);
 
-  set(params, opts){
-    setQuery(params, opts);
-    this.handle(true);
-  }
-};
+  // aplica params
+  Object.entries(params || {}).forEach(([k, v]) => {
+    if (v === null || v === undefined || v === "") url.searchParams.delete(k);
+    else url.searchParams.set(k, String(v));
+  });
+
+  const next =
+    url.pathname +
+    (url.searchParams.toString() ? `?${url.searchParams.toString()}` : "");
+
+  const current = window.location.pathname + window.location.search;
+
+  // ✅ Evita bucles infinitos
+  if (next === current) return;
+
+  if (replace) history.replaceState({}, "", next);
+  else history.pushState({}, "", next);
+}
+
+export function onPopState(cb) {
+  window.addEventListener("popstate", () => {
+    // evita re-entradas
+    suppressUrlSync = true;
+    try {
+      cb(getQuery());
+    } finally {
+      suppressUrlSync = false;
+    }
+  });
+}
