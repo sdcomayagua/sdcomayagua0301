@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es-HN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin | SD-Comayagua</title>
+  <link rel="stylesheet" href="./css/admin.css" />
+</head>
+<body>
+  <main class="wrap">
+    <header class="head">
+      <div class="brand">
+        <img src="../assets/logo-bw.png" alt="Logo" />
+        <div>
+          <strong>Admin - SD-Comayagua</strong>
+          <small>Google Sheets + Apps Script</small>
+        </div>
+      </div>
+      <div class="row">
+        <button id="btnLogout" class="btn">Salir</button>
+        <a class="btn" href="../" target="_blank" rel="noopener">Abrir tienda</a>
+      </div>
+    </header>
+
+    <section id="auth" class="card">
+      <h2>Iniciar sesión</h2>
+      <p>Ingresa tu <b>ADMIN_KEY</b> para administrar productos y envíos.</p>
+      <div class="grid">
+        <div class="field">
+          <label>API_BASE (Web App)</label>
+          <input id="apiBase" placeholder="https://script.google.com/macros/s/....../exec" />
+          <small>Debe ser la misma URL que en la tienda.</small>
+        </div>
+        <div class="field">
+          <label>ADMIN_KEY</label>
+          <input id="adminKey" type="password" placeholder="Tu clave" />
+          <small>No se guarda en el backend. Se usa solo para POST.</small>
+        </div>
+      </div>
+      <div class="row">
+        <button id="btnLogin" class="btn primary">Entrar</button>
+      </div>
+    </section>
+
+    <section id="app" class="hidden">
+      <div class="tabs">
+        <button class="tab active" data-tab="productos">Productos</button>
+        <button class="tab" data-tab="envios">Envíos</button>
+        <button class="tab" data-tab="ajustes">Ajustes</button>
+      </div>
+
+      <section id="tab-productos" class="card">
+        <div class="cardhead">
+          <h2>Productos</h2>
+          <div class="row">
+            <input id="pSearch" placeholder="Buscar..." />
+            <button id="btnNew" class="btn primary">Nuevo</button>
+          </div>
+        </div>
+        <div id="pTable" class="table"></div>
+      </section>
+
+      <section id="tab-envios" class="card hidden">
+        <div class="cardhead">
+          <h2>Envíos</h2>
+          <div class="row">
+            <button id="btnNewShip" class="btn primary">Nuevo envío</button>
+          </div>
+        </div>
+        <div id="sTable" class="table"></div>
+      </section>
+
+      <section id="tab-ajustes" class="card hidden">
+        <div class="cardhead">
+          <h2>Ajustes</h2>
+          <p class="muted">Recargos por método de pago (editable).</p>
+        </div>
+        <div id="settingsBox"></div>
+      </section>
+    </section>
+  </main>
+
+  <div id="portal"></div>
+
+  <script type="module" src="./js/admin.js"></script>
+</body>
+</html>
