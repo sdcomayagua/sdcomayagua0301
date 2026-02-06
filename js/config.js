@@ -12,3 +12,4 @@ export const CONFIG = {
 
   CACHE_TTL_MS: 60_000, // coincide con backend
 };
+
