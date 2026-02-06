@@ -8,7 +8,7 @@ export const CONFIG = {
 
   // ✅ Pega aquí tu URL de Web App (Apps Script desplegado como Web App):
   // Ejemplo: https://script.google.com/macros/s/AKfycb.../exec
-  API_BASE: "PASTE_YOUR_WEBAPP_URL_HERE",
+  API_BASE: "https://script.google.com/macros/s/AKfycbw2oXVge0_FjSJPHSFYCx5TRGtn4ZsvGX3Hmiz2F8FuoWiwlpiQgLSCK1ljlJbv8TI/exec",
 
   CACHE_TTL_MS: 60_000, // coincide con backend
 };
