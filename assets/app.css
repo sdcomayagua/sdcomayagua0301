@@ -156,7 +156,7 @@ a{color:inherit}
   margin-top:auto;
   display:flex;align-items:center;justify-content:space-between;gap:10px
 }
-.price strong{font-size:16px;white-space:nowrap}
+.price strong{font-size:16px;white-space:nowrap;display:inline-flex;align-items:baseline;gap:6px;padding:10px 12px;border-radius:14px;background:color-mix(in srgb, var(--surface) 75%, transparent);border:1px solid var(--border)}
 .smallbtn{
   border:1px solid var(--border);
   background:var(--surface);
@@ -236,8 +236,8 @@ a{color:inherit}
 body[data-page="admin"] .brand{gap:10px}
 body[data-page="admin"] .brand > div{display:none !important;} /* hide text next to logo */
 body[data-page="admin"] .brandlogo{
-  width: min(150px, 44vw);
-  max-width: 160px;
+  width: min(220px, 64vw);
+  max-width: 240px;
   height:auto;
   max-height:52px;
   display:block;
@@ -245,8 +245,8 @@ body[data-page="admin"] .brandlogo{
 }
 @media (max-width: 560px){
   body[data-page="admin"] .brandlogo{
-  width: min(150px, 44vw);
-  max-width: 160px;
+  width: min(220px, 64vw);
+  max-width: 240px;
   height:auto;
   max-height:52px;
   display:block;
@@ -279,8 +279,8 @@ body[data-page="admin"] .btn:active{transform: translateY(0)}
 /* Admin: brand + header refinements */
 body[data-page="admin"] .brand{gap:12px}
 body[data-page="admin"] .brandlogo{
-  width: min(150px, 44vw);
-  max-width: 160px;
+  width: min(220px, 64vw);
+  max-width: 240px;
   height:auto;
   max-height:52px;
   display:block;
@@ -332,8 +332,8 @@ td small{color:var(--muted)}
   body[data-page="admin"] .actions{gap:8px}
   body[data-page="admin"] .actions .btn{padding:10px 10px}
   body[data-page="admin"] .brandlogo{
-  width: min(150px, 44vw);
-  max-width: 160px;
+  width: min(220px, 64vw);
+  max-width: 240px;
   height:auto;
   max-height:52px;
   display:block;
@@ -602,7 +602,7 @@ body[data-page="admin"] .admin-cardrow{border:0;background:transparent;box-shado
 .card .img{background: linear-gradient(180deg, var(--surface), color-mix(in srgb, var(--surface) 70%, transparent));}
 .card .title{font-size:14px}
 .card .body{gap:10px}
-.price strong{font-size:17px;white-space:nowrap}
+.price strong{font-size:17px;white-space:nowrap;display:inline-flex;align-items:baseline;gap:6px;padding:10px 12px;border-radius:14px;background:color-mix(in srgb, var(--surface) 75%, transparent);border:1px solid var(--border)}
 .smallbtn{font-weight:800}
 
 .skeleton{
@@ -614,6 +614,9 @@ body[data-page="admin"] .admin-cardrow{border:0;background:transparent;box-shado
   height: 330px;
 }
 @keyframes sk{ 0%{background-position: 0% 0} 100%{background-position: -200% 0} }
+
+.skeleton.sk-mini{height:260px;min-width:260px;max-width:260px}
+@media (max-width:520px){.skeleton.sk-mini{min-width:82vw;max-width:82vw;height:240px}}
 
 
 /* ===== ULTRA polish ===== */
@@ -904,9 +907,9 @@ body[data-page="admin"] .admin-cardrow{border:0;background:transparent;box-shado
 .hrow1{ justify-content:flex-start; }
 .hbrand{ gap:0; }
 .hlogo-wide{
-  /* Logo barra: más compacto en móvil */
-  width: min(240px, 86vw);
-  height: 52px;
+  /* Logo barra: compacto en móvil */
+  width: min(210px, 74vw);
+  height: 44px;
   object-fit: contain;
   padding: 0;
   background: transparent;
@@ -924,9 +927,9 @@ body[data-page="admin"] .admin-cardrow{border:0;background:transparent;box-shado
 @media (max-width: 420px){
   .container{padding:12px}
   .hlogo-wide{
-  /* Logo barra: más compacto en móvil */
-  width: min(240px, 86vw);
-  height: 52px;
+  /* Logo barra: compacto en móvil */
+  width: min(210px, 74vw);
+  height: 44px;
   object-fit: contain;
   padding: 0;
   background: transparent;
@@ -971,3 +974,6 @@ body[data-page="admin"] .admin-cardrow{border:0;background:transparent;box-shado
   .topbar .actions .btn{padding:10px 12px;border-radius:16px;font-weight:800}
   .topbar .actions .btn.primary{padding:10px 12px}
 }
+
+/* Store: sticky header con sombra suave */
+body[data-page="store"] .topbar{ position:sticky; top:0; z-index:60; }

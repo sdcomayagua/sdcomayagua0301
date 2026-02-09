@@ -831,6 +831,16 @@ function closeModal(){
 }
 
 /* ===== Boot storefront ===== */
+
+function setHomeSkeletons(){
+  const mk = (n, extraCls="") => Array.from({length:n}).map(()=>`<div class="skeleton ${extraCls}"></div>`).join("");
+  // grids horizontales en Home
+  ["featuredGrid","ofertasGrid","nuevosGrid","celGrid","hogarGrid"].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = mk(6, "sk-mini");
+  });
+}
+
 async function bootStore(){
   applyTheme();
   const cfg = getConfig();
@@ -902,6 +912,7 @@ async function bootStore(){
   if(grid){
     grid.innerHTML = Array.from({length:8}).map(()=>`<div class="skeleton"></div>`).join("");
   }
+  setHomeSkeletons();
 
   // Fast cache first
   const cached = getCachedProducts();
