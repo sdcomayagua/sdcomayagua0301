@@ -52,6 +52,11 @@ a{color:inherit}
   display:grid;place-items:center;
   color:#001018;font-weight:900;
 }
+.brandlogo{
+  width:56px;height:auto;max-height:44px;
+  display:block;
+  filter: drop-shadow(0 6px 14px rgba(2,6,23,.18));
+}
 .brand h1{font-size:16px;margin:0}
 .brand p{margin:0;color:var(--muted);font-size:12px}
 .actions{display:flex;gap:10px;align-items:center}
@@ -221,13 +226,48 @@ a{color:inherit}
 }
 
 /* Admin */
+.body-admin{background:var(--surface)}
+body[data-page="admin"]{background:var(--surface)}
+body[data-page="admin"] .container{max-width:1180px}
+body[data-page="admin"] .topbar{
+  background: color-mix(in srgb, var(--card) 82%, white);
+  box-shadow: 0 8px 22px rgba(2,6,23,.06);
+}
+body[data-page="admin"] .topbar-inner{padding-top:6px;padding-bottom:6px}
+body[data-page="admin"] .brand h1{font-size:15px;letter-spacing:-.2px}
+body[data-page="admin"] .brand p{font-size:12px}
+body[data-page="admin"] .actions .btn{border-radius:14px}
+body[data-page="admin"] .btn{
+  box-shadow: 0 8px 18px rgba(2,6,23,.08);
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+}
+body[data-page="admin"] .btn:hover{transform: translateY(-1px);box-shadow:0 12px 26px rgba(2,6,23,.12)}
+body[data-page="admin"] .btn:active{transform: translateY(0)}
+
+/* Admin: brand + header refinements */
+body[data-page="admin"] .brand{gap:12px}
+body[data-page="admin"] .brandlogo{width:64px;max-height:50px}
+body[data-page="admin"] .brand h1{font-size:16px;font-weight:900}
+body[data-page="admin"] .actions{gap:8px}
+body[data-page="admin"] .actions .btn{padding:10px 12px}
+body[data-page="admin"] .actions .btn.primary{color:#001018}
+
+/* Admin: nicer section headers */
+body[data-page="admin"] .panel .ph{background: color-mix(in srgb, var(--surface) 55%, white)}
+body[data-page="admin"] #cfgToggle{
+  font-weight:800;
+  box-shadow:none;
+  background: color-mix(in srgb, var(--card) 70%, var(--surface));
+}
+body[data-page="admin"] #cfgToggle:hover{box-shadow:0 10px 20px rgba(2,6,23,.10)}
+
 .admin-wrap{display:grid;grid-template-columns: 320px 1fr;gap:12px;margin-top:14px}
 @media (max-width: 980px){ .admin-wrap{grid-template-columns: 1fr;} }
 .panel{
   border:1px solid var(--border);
   background:var(--card);
   border-radius: 18px;
-  box-shadow: var(--shadow);
+  box-shadow: 0 12px 30px rgba(2,6,23,.10);
   overflow:hidden;
 }
 .panel .ph{padding:12px 12px 10px;border-bottom:1px solid var(--border)}
@@ -242,6 +282,15 @@ th{font-size:12px;color:var(--muted);text-align:left}
 td small{color:var(--muted)}
 .tr-actions{display:flex;gap:8px}
 .inline{width:110px}
+
+/* Admin: topbar actions on mobile */
+@media (max-width: 560px){
+  body[data-page="admin"] .container{padding:12px}
+  body[data-page="admin"] .topbar-inner{flex-wrap:wrap;gap:10px}
+  body[data-page="admin"] .actions{gap:8px}
+  body[data-page="admin"] .actions .btn{padding:10px 10px}
+  body[data-page="admin"] .brandlogo{width:52px;max-height:40px}
+}
 
 /* Admin: tabla más linda + responsive */
 .prodcell{display:flex;gap:10px;align-items:flex-start}
@@ -267,16 +316,32 @@ td small{color:var(--muted)}
 .imgprev img{width:100%;height:100%;object-fit:cover;display:block}
 
 @media (max-width: 720px){
+  /* Fullscreen-friendly admin editor on mobile */
+  #editBackdrop.backdrop{padding:6px;align-items:stretch}
+  .modal-admin{border-radius:22px}
+  .modal-admin .modal-head{padding:14px 12px 10px}
+  .modal-admin .modal-head .btn.icon{width:46px;height:46px;font-size:18px}
+  .modal-admin .modal-body{padding:12px}
+  .modal-foot-admin{padding:12px}
+
   table thead{display:none}
   table,tbody,tr,td,th{display:block;width:100%}
-  tr{border-bottom:1px solid var(--border);padding:6px 0}
-  td{border:0;padding:8px 12px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+  tr{
+    border:1px solid var(--border);
+    border-radius:18px;
+    margin:10px 10px;
+    background: color-mix(in srgb, var(--card) 92%, white);
+    box-shadow: 0 10px 24px rgba(2,6,23,.08);
+    overflow:hidden;
+  }
+  tbody{padding:8px 0}
+  td{border:0;padding:10px 12px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
   td::before{content:attr(data-label);font-size:12px;color:var(--muted);min-width:86px;padding-top:2px}
   td[data-label="Producto"]{padding-top:12px}
   .tr-actions{justify-content:flex-end}
 
-  .modal-admin{width:calc(100vw - 16px);max-width:none}
-  .modal-admin .modal-body{grid-template-columns:1fr !important;max-height:calc(100vh - 160px);overflow:auto}
+  .modal-admin{width:calc(100vw - 12px);max-width:none;height:calc(100vh - 12px)}
+  .modal-admin .modal-body{grid-template-columns:1fr !important;max-height:none;overflow:auto}
   .modal-admin .modal-head{position:sticky;top:0;background:var(--card);z-index:3}
   .modal-foot-admin{position:sticky;bottom:0;background:var(--card);z-index:3;border-top:1px solid var(--border)}
 }
