@@ -1142,25 +1142,32 @@ function renderAdminTable(){
 
   const cfg = getConfig();
   const tbody = $("#atable");
+  // Render tipo “MercadoLibre”: foto izquierda, info centro, acciones derecha.
   tbody.innerHTML = items.map(p=>{
-    const priceText = (p.precio==="" || p.precio===null || p.precio===undefined) ? "Consultar" : fmtMoney(p.precio, cfg.CURRENCY, cfg.LOCALE);
+    const priceText = (p.precio==="" || p.precio===null || p.precio===undefined)
+      ? "Consultar"
+      : fmtMoney(p.precio, cfg.CURRENCY, cfg.LOCALE);
     const img = (p.img||"").trim();
+    const badge = p.activo ? "<span class='badge ok'>Activo</span>" : "<span class='badge bad'>Inactivo</span>";
+
     return `
-      <tr>
-        <td data-label="Producto">
-          <div class="prodcell">
-            <div class="athumb">${img ? `<img src="${escapeHtml(img)}" alt="${escapeHtml(p.nombre)}">` : `<span>📦</span>`}</div>
-            <div>
-              <strong>${escapeHtml(p.nombre)}</strong><br>
-              <small>${escapeHtml(p.categoria)} • ${escapeHtml(p.subcategoria)}</small>
+      <tr class="admin-cardrow">
+        <td>
+          <div class="acard">
+            <div class="acard-thumb">${img ? `<img src="${escapeHtml(img)}" alt="${escapeHtml(p.nombre)}">` : `<span>📦</span>`}</div>
+            <div class="acard-main">
+              <div class="acard-title">${escapeHtml(p.nombre)}</div>
+              <div class="acard-meta">${escapeHtml(p.categoria)} • ${escapeHtml(p.subcategoria)}</div>
+              <div class="acard-badges">${badge}</div>
+            </div>
+            <div class="acard-right">
+              <div class="acard-price">${escapeHtml(priceText)}</div>
+              <div class="acard-stock">Stock: <strong>${escapeHtml(String(p.stock||0))}</strong></div>
+              <div class="acard-actions">
+                <button class="btn" data-edit="${escapeHtml(p.id)}">Editar</button>
+              </div>
             </div>
           </div>
-        </td>
-        <td data-label="Precio"><span class="aval money">${escapeHtml(priceText)}</span></td>
-        <td data-label="Stock"><span class="aval num">${escapeHtml(String(p.stock||0))}</span></td>
-        <td data-label="Estado">${p.activo ? "<span class='badge ok'>Activo</span>" : "<span class='badge bad'>Inactivo</span>"}</td>
-        <td class="tr-actions" data-label="Acciones">
-          <button class="btn" data-edit="${escapeHtml(p.id)}">Editar</button>
         </td>
       </tr>
     `;

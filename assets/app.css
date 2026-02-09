@@ -342,6 +342,60 @@ td small{color:var(--muted)}
   .aval{min-width:110px}
 }
 
+/* Admin: lista tipo “MercadoLibre” (tarjetas) */
+body[data-page="admin"] table thead{display:none}
+body[data-page="admin"] .admin-cardrow td{padding:0;border:0;display:block}
+body[data-page="admin"] .admin-cardrow td::before{content:none;display:none}
+body[data-page="admin"] #atable{display:block}
+body[data-page="admin"] .admin-cardrow{border:0;background:transparent;box-shadow:none;margin:0}
+
+.acard{
+  display:grid;
+  grid-template-columns: 64px 1fr 170px;
+  gap:12px;
+  align-items:center;
+  padding:14px;
+  margin:10px 12px;
+  border:1px solid var(--border);
+  border-radius:18px;
+  background: color-mix(in srgb, var(--card) 94%, white);
+  box-shadow: 0 10px 24px rgba(2,6,23,.08);
+}
+.acard-thumb{
+  width:64px;height:64px;
+  border-radius:18px;
+  overflow:hidden;
+  border:1px solid var(--border);
+  background:var(--surface);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow: var(--shadow);
+}
+.acard-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.acard-title{font-weight:900;letter-spacing:-.2px}
+.acard-meta{margin-top:2px;color:var(--muted);font-size:12px}
+.acard-badges{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
+
+.acard-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.acard-price{
+  font-weight:950;
+  font-size:18px;
+  padding:8px 12px;
+  border-radius:16px;
+  border:1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 70%, white);
+  box-shadow: 0 8px 18px rgba(2,6,23,.10);
+  white-space:nowrap;
+}
+.acard-stock{color:var(--muted);font-size:12px;white-space:nowrap}
+.acard-actions .btn{padding:10px 12px}
+
+@media (max-width: 560px){
+  .acard{grid-template-columns: 56px 1fr;grid-template-rows:auto auto;align-items:start}
+  .acard-thumb{width:56px;height:56px;border-radius:16px}
+  .acard-right{grid-column:1 / -1;flex-direction:row;align-items:center;justify-content:space-between}
+  .acard-price{font-size:20px}
+}
+
 
 /* Admin modal layout fixes (scroll + sticky footer on mobile) */
 .modal-admin{display:flex;flex-direction:column;max-height:calc(100dvh - 16px);height:min(900px, calc(100dvh - 16px));}
