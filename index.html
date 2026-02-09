@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Soluciones Digitales Comayagua | Tienda</title>
+  <meta name="description" content="Tienda online en Comayagua. Pedidos por WhatsApp.">
+
+  <meta property="og:title" content="Soluciones Digitales Comayagua | Tienda">
+  <meta property="og:description" content="Productos para celular, tecnología, hogar y más. Pedidos por WhatsApp.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_HN">
+  <meta name="theme-color" content="#0ea5e9">
+
+  <link rel="stylesheet" href="assets/app.css">
+  <script defer src="assets/config.js"></script>
+  <script defer src="assets/app.js"></script>
+</head>
+<body data-page="store">
+  <noscript>
+    <div class="container">
+      <div class="empty" style="display:block">
+        Esta tienda necesita JavaScript para funcionar.
+      </div>
+    </div>
+  </noscript>
+
+  <header class="topbar">
+  <div class="container topbar-inner retailhead">
+    <div class="brand retailbrand">
+      <div class="logo retaillogo" aria-hidden="true">SD</div>
+      <div class="brandtext">
+        <h1 id="brandName">SDComayagua</h1>
+        <p id="brandSub">Tienda en Comayagua • Pedidos por WhatsApp</p>
+      </div>
+    </div>
+
+    <div class="headsearch" role="search" aria-label="Buscar productos">
+      <input class="input" id="qHome" placeholder="Buscar productos (ej: audífonos, cargador, USB)..." />
+      <button class="btn icon" id="clearHome" type="button" title="Limpiar búsqueda" aria-label="Limpiar">✕</button>
+    </div>
+
+    <div class="headactions">
+      <button class="btn" id="catsBtn" type="button">Categorías</button>
+      <a class="btn primary" id="waTop" href="#" target="_blank" rel="noopener">WhatsApp</a>
+      <button class="btn icon" id="themeBtn" type="button" title="Modo claro/oscuro" aria-label="Tema">☾</button>
+      <button class="btn" id="cfgBtnTop" type="button">Config</button>
+    </div>
+  </div>
+</header>
+
+  <main class="container">
+
+    <section class="hero2">
+      <div class="wrap">
+        <div>
+          <h2>Comprá rápido por categorías</h2>
+          <p>Elegí una categoría, mirá los productos disponibles y pedí directo por WhatsApp. Sin complicaciones.</p>
+          <div class="cta">
+            <button class="btn primary" id="goCats" type="button">Ver categorías</button>
+            <button class="btn" id="goAll" type="button">Ver todo</button>
+            <button class="btn" id="cfgBtn" type="button">Config</button>
+            <span class="btn" id="loading" style="display:none;pointer-events:none;">Cargando…</span>
+          </div>
+        </div>
+        <div style="display:grid;gap:10px">
+          <div class="kpi"><strong>✅ Productos reales</strong><span>Catálogo sincronizado</span></div>
+          <div class="kpi"><strong>🚚 Envíos locales</strong><span>Comayagua y alrededores</span></div>
+          <div class="kpi"><strong>📲 Pedido por WhatsApp</strong><span>Respuesta rápida</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slider fade-in" id="slider">
+      <div class="slide" id="slide">
+        <img id="slideImg" alt="Promoción">
+        <div class="overlay"></div>
+        <div class="dots" id="dots"></div>
+        <div class="content">
+          <h2 id="slideTitle">Ofertas y lo más buscado</h2>
+          <p id="slideText">Toca una categoría y encontrá lo que necesitás. Pedí por WhatsApp.</p>
+          <div class="row">
+            <button class="btn primary" id="slideCTA" type="button">Ver ofertas</button>
+            <button class="btn" id="slideCTA2" type="button">Ver categorías</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="quickbar">
+      <div class="left">
+        <div class="pill">📍 Comayagua, Honduras</div>
+        <div class="pill">🚚 Envíos locales</div>
+        <div class="pill">💳 Pago según acuerdo</div>
+      </div>
+      <div class="right">
+        <div class="pill">🛡️ Compra segura</div>
+      </div>
+    </div>
+
+    <section class="section fade-in" id="featuredSec" style="display:none">
+      <div class="sh">
+        <div>
+          <h3>Destacados</h3>
+          <p>Lo más buscado / recomendado</p>
+        </div>
+        <a href="#" id="seeAllLink2">Ver todo</a>
+      </div>
+      <div class="sb">
+        <div class="rowcards" id="featuredGrid"></div>
+      </div>
+    </section>
+
+    
+    <section class="section fade-in" id="secOfertas" style="display:none">
+      <div class="sh">
+        <div>
+          <h3>Ofertas</h3>
+          <p>Promos, combos y precios especiales</p>
+        </div>
+        <button class="btnlink" id="seeOfertas" type="button">Ver más</button>
+      </div>
+      <div class="sb">
+        <div class="hscroll" id="ofertasGrid"></div>
+      </div>
+    </section>
+
+    <section class="section fade-in" id="secNuevos" style="display:none">
+      <div class="sh">
+        <div>
+          <h3>Nuevos</h3>
+          <p>Recién agregados al catálogo</p>
+        </div>
+        <button class="btnlink" id="seeNuevos" type="button">Ver más</button>
+      </div>
+      <div class="sb">
+        <div class="hscroll" id="nuevosGrid"></div>
+      </div>
+    </section>
+
+    <section class="section fade-in" id="secCel" style="display:none">
+      <div class="sh">
+        <div>
+          <h3>Celulares y accesorios</h3>
+          <p>Lo más buscado para tu teléfono</p>
+        </div>
+        <button class="btnlink" id="seeCel" type="button">Ver más</button>
+      </div>
+      <div class="sb">
+        <div class="hscroll" id="celGrid"></div>
+      </div>
+    </section>
+
+    <section class="section fade-in" id="secHogar" style="display:none">
+      <div class="sh">
+        <div>
+          <h3>Hogar y cocina</h3>
+          <p>Artículos útiles para tu casa</p>
+        </div>
+        <button class="btnlink" id="seeHogar" type="button">Ver más</button>
+      </div>
+      <div class="sb">
+        <div class="hscroll" id="hogarGrid"></div>
+      </div>
+    </section>
+
+    <section id="homeCats">
+      <div class="section-title">
+        <h3>Categorías</h3>
+        <a href="#" id="seeAllLink">Ver todo</a>
+      </div>
+      <div class="cat-grid" id="catGrid"></div>
+    </section>
+
+    <section id="catView" style="display:none">
+      <div class="breadcrumb">
+        <button id="bcHome" type="button">Inicio</button>
+        <span>›</span>
+        <span id="bcCat">Categoría</span>
+        <span id="bcSubWrap" style="display:none"><span>›</span> <span id="bcSub">Subcategoría</span></span>
+      </div>
+
+      <div class="toolbar">
+        <div class="left">
+          <h3 style="margin:0" id="catTitle">Categoría</h3>
+        </div>
+        <div class="right">
+          <input class="input" id="q" placeholder="Buscar en esta categoría..." style="max-width:320px">
+          <select class="input select" id="sort" title="Ordenar" style="max-width:220px">
+            <option value="relevancia">Relevancia</option>
+            <option value="precio_asc">Precio: menor a mayor</option>
+            <option value="precio_desc">Precio: mayor a menor</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="pillscroll" id="subPills"></div>
+
+      <section id="empty" class="empty" style="display:none">
+        No hay productos para mostrar.
+      </section>
+
+      <section class="grid products" id="grid"></section>
+    </section>
+
+    <footer class="footer">
+      © <span id="year"></span> Soluciones Digitales Comayagua • Tienda online
+    </footer>
+  </main>
+
+  <div class="backdrop" id="backdrop" role="dialog" aria-modal="true" aria-label="Producto">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <h3 id="mTitle">Producto</h3>
+          <p id="mSub">Categoría</p>
+        </div>
+        <button class="btn icon" id="closeModal" aria-label="Cerrar">✕</button>
+      </div>
+      <div class="modal-body">
+        <div>
+          <div class="mainimg"><img id="mMainImg" alt="Imagen del producto"></div>
+          <div class="thumbs" id="mThumbs"></div>
+        </div>
+        <div class="side">
+          <div class="row" id="mMeta"></div>
+          <div class="pricebig" id="mPrice">Lps. 0</div>
+          <div class="desc" id="mDesc"></div>
+          <div class="row">
+            <a class="btn primary" id="mWA" href="#" target="_blank">Comprar por WhatsApp</a>
+            <button class="btn" id="mCopy" type="button">Copiar link</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="backdrop" id="cfgBackdrop" style="display:none" role="dialog" aria-modal="true" aria-label="Configuración">
+    <div class="modal" style="max-width:780px">
+      <div class="modal-head">
+        <div>
+          <h3>Configuración</h3>
+          <p>No necesitas editar archivos. Se guarda en este navegador.</p>
+        </div>
+        <button class="btn icon" id="cfgClose" aria-label="Cerrar">✕</button>
+      </div>
+      <div class="modal-body" style="grid-template-columns:1fr">
+        <div class="kv">
+          <label>Nombre de la tienda</label>
+          <input class="input" id="cfgName" placeholder="Soluciones Digitales Comayagua">
+          <label>API Base (Apps Script WebApp)</label>
+          <input class="input" id="cfgApi" placeholder="https://script.google.com/macros/s/.../exec">
+          <label>WhatsApp (solo números)</label>
+          <input class="input" id="cfgWa" placeholder="50431517755">
+          <label>WhatsApp a mostrar (texto)</label>
+          <input class="input" id="cfgWaDisplay" placeholder="+504 3151-7755">
+          <label>Moneda</label>
+          <input class="input" id="cfgCur" placeholder="Lps.">
+          <button class="btn primary" id="cfgSave" type="button">Guardar</button>
+          <div class="help">La tienda usa cache local para cargar más rápido.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+  <a class="fab-wa" id="waFab" href="#" target="_blank" aria-label="WhatsApp">
+    💬 <span>WhatsApp</span>
+  </a>
+</body>
+</html>
