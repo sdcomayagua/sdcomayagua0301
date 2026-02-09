@@ -21,7 +21,7 @@
       </div>
       <div class="actions">
         <button class="btn" id="storeBtn">Ver tienda</button>
-        <button class="btn icon" id="themeBtn" title="Modo claro/oscuro">☾</button>
+        <!-- SOLO modo claro: ocultamos el botón de tema -->
         <button class="btn" id="logoutBtn">Salir</button>
       </div>
     </div>
@@ -46,8 +46,11 @@
     <section class="admin-wrap" id="adminUI" style="display:none">
       <!-- Left: config + quick actions -->
       <div class="panel">
-        <div class="ph"><h3>Configuración</h3></div>
-        <div class="pb">
+        <div class="ph" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <h3 style="margin:0">Admin</h3>
+          <button class="btn" id="cfgToggle" type="button" aria-expanded="false">⚙️ Configuración</button>
+        </div>
+        <div class="pb" id="cfgPanel" style="display:none">
           <div class="kv">
             <label>Nombre de la tienda</label>
             <input class="input" id="cfgNameA">
@@ -78,6 +81,7 @@
           <div class="searchrow" style="margin-top:10px">
             <input class="input" id="aq" placeholder="Buscar producto...">
             <select class="input select" id="afCat"><option>Todas</option></select>
+            <select class="input select" id="afSub" style="display:none"><option>Todas</option></select>
             <select class="input select" id="afActive">
               <option value="todos">Todos</option>
               <option value="activos">Activos</option>
@@ -105,7 +109,7 @@
 
   <!-- Editor Modal -->
   <div class="backdrop" id="editBackdrop" style="display:none" role="dialog" aria-modal="true" aria-label="Editor">
-    <div class="modal" style="max-width:980px">
+    <div class="modal modal-admin" style="max-width:980px">
       <div class="modal-head">
         <div>
           <h3 id="editorTitle">Editar</h3>
@@ -113,7 +117,7 @@
         </div>
         <button class="btn icon" id="closeEdit" aria-label="Cerrar">✕</button>
       </div>
-      <div class="modal-body" style="grid-template-columns:1fr 1fr">
+      <div class="modal-body modal-grid">
         <div class="kv">
           <label>ID</label>
           <input class="input" id="eid" readonly>
@@ -139,6 +143,9 @@
         <div class="kv">
           <label>Imagen principal (URL)</label>
           <input class="input" id="eimg" placeholder="https://...">
+          <div class="imgprev" aria-label="Vista previa">
+            <img id="eimgPreview" alt="Vista previa del producto">
+          </div>
           <label>Video (opcional, URL)</label>
           <input class="input" id="evideo" placeholder="https://...">
           <div class="panel" style="box-shadow:none">
@@ -154,13 +161,14 @@
             </div>
           </div>
 
-          <div style="display:flex;gap:10px">
-            <button class="btn primary" id="saveBtn" type="button">Guardar</button>
-            <button class="btn" id="delBtn" type="button" style="display:none">Eliminar</button>
-          </div>
-
           <div class="help">Si el botón Guardar falla, necesitas el backend premium con updateProduct/deleteProduct.</div>
         </div>
+      </div>
+      <div class="modal-foot modal-foot-admin">
+        <button class="btn" id="delBtn" type="button" style="display:none">Eliminar</button>
+        <div style="flex:1"></div>
+        <button class="btn" id="closeEdit2" type="button">Cerrar</button>
+        <button class="btn primary" id="saveBtn" type="button">Guardar</button>
       </div>
     </div>
   </div>
