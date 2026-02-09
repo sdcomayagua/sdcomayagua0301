@@ -150,7 +150,7 @@ a{color:inherit}
   margin-top:auto;
   display:flex;align-items:center;justify-content:space-between;gap:10px
 }
-.price strong{font-size:16px}
+.price strong{font-size:16px;white-space:nowrap}
 .smallbtn{
   border:1px solid var(--border);
   background:var(--surface);
@@ -212,7 +212,7 @@ a{color:inherit}
 .side{
   display:flex;flex-direction:column;gap:10px;
 }
-.side .pricebig{font-size:22px;font-weight:900;color:var(--primary)}
+.side .pricebig{font-size:22px;font-weight:900;color:var(--primary);white-space:nowrap}
 .desc{
   border:1px solid var(--border);
   background:var(--surface);
@@ -315,6 +315,11 @@ td small{color:var(--muted)}
 }
 .imgprev img{width:100%;height:100%;object-fit:cover;display:block}
 
+
+/* Admin modal layout fixes (scroll + sticky footer on mobile) */
+.modal-admin{display:flex;flex-direction:column}
+.modal-admin .modal-body{flex:1;overflow:auto;-webkit-overflow-scrolling:touch}
+.modal-admin .modal-foot-admin{flex:0 0 auto}
 @media (max-width: 720px){
   /* Fullscreen-friendly admin editor on mobile */
   #editBackdrop.backdrop{padding:6px;align-items:stretch}
@@ -473,7 +478,7 @@ td small{color:var(--muted)}
 .card .img{background: linear-gradient(180deg, var(--surface), color-mix(in srgb, var(--surface) 70%, transparent));}
 .card .title{font-size:14px}
 .card .body{gap:10px}
-.price strong{font-size:17px}
+.price strong{font-size:17px;white-space:nowrap}
 .smallbtn{font-weight:800}
 
 .skeleton{
@@ -579,7 +584,7 @@ td small{color:var(--muted)}
 .card .meta{gap:6px}
 .badge{font-weight:800}
 
-.price strong{font-size:18px;letter-spacing:-.2px}
+.price strong{font-size:18px;letter-spacing:-.2px;white-space:nowrap}
 .smallbtn{
   background: color-mix(in srgb, var(--primary) 10%, var(--surface));
   border-color: color-mix(in srgb, var(--primary) 20%, var(--border));
@@ -587,7 +592,7 @@ td small{color:var(--muted)}
 
 .modal{ border-radius: 22px; }
 .modal-head h3{font-size:15px}
-.pricebig{font-size:24px}
+.pricebig{font-size:24px;white-space:nowrap}
 
 .fab-wa{
   position:fixed; right:16px; bottom:16px; z-index:1200;
