@@ -335,9 +335,120 @@ async function bootStore(){
 
 /* ===== Admin ===== */
 function bootAdmin(){
-  // Lógica de admin original (login, list, editor)
-  console.log("[BOOT ADMIN] Modo administrador detectado");
-  // Añade aquí tu código original de admin si es necesario, o deja para otro archivo.
+  console.log("[BOOT ADMIN] Iniciando modo administrador");
+  
+  const loginBox = $("#loginBox");
+  const adminUI = $("#adminUI");
+  const key = localStorage.getItem("SDCO_ADMIN_KEY");
+
+  console.log("[ADMIN] Clave en localStorage:", key ? "SÍ (longitud " + key.length + ")" : "NO");
+
+  if (key) {
+    // Validar clave y cargar datos
+    $("#aloading").style.display = "inline";
+    apiPost("updateProduct", { adminKey: key, product: { id: "test" } }) // Prueba POST simple para validar clave
+      .then(() => {
+        console.log("[ADMIN] Clave válida → cargando lista");
+        loadAdminProducts(key);
+      })
+      .catch(err => {
+        console.error("[ADMIN] Clave inválida o error:", err.message);
+        toast("Clave incorrecta o error en API. Intenta de nuevo.", 4000);
+        localStorage.removeItem("SDCO_ADMIN_KEY");
+        if (loginBox) loginBox.style.display = "block";
+        if (adminUI) adminUI.style.display = "none";
+      })
+      .finally(() => $("#aloading").style.display = "none");
+  } else {
+    if (loginBox) loginBox.style.display = "block";
+    if (adminUI) adminUI.style.display = "none";
+  }
+
+  // Evento Entrar
+  $("#loginBtn")?.addEventListener("click", () => {
+    const enteredKey = $("#adminKey").value.trim();
+    if (!enteredKey) return toast("Ingresa la clave");
+    localStorage.setItem("SDCO_ADMIN_KEY", enteredKey);
+    location.reload(); // Recarga para aplicar
+  });
+
+  // Logout
+  $("#logoutBtn")?.addEventListener("click", () => {
+    localStorage.removeItem("SDCO_ADMIN_KEY");
+    location.reload();
+  });
+}
+
+async function loadAdminProducts(adminKey) {
+  try {
+    const productos = await apiGetProducts(); // Usa GET público
+    console.log("[ADMIN] Productos para tabla:", productos.length);
+
+    const tbody = $("#atable");
+    if (!tbody) {
+      console.error("[ADMIN] No se encontró la tabla #atable");
+      toast("Error: No se encontró la tabla en el HTML", 5000);
+      return;
+    }
+
+    tbody.innerHTML = productos.map(p => `
+      <tr>
+        <td>${p.nombre || "Sin nombre"}</td>
+        <td>${fmtMoney(p.precio)}</td>
+        <td>${p.stock || 0}</td>
+        <td>${p.activo ? '<span style="color:#16a34a">Activo</span>' : '<span style="color:#dc2626">Inactivo</span>'}</td>
+        <td>
+          <button class="btn small edit" data-id="${p.id}">Editar</button>
+          <button class="btn small delete" data-id="${p.id}">Eliminar</button>
+        </td>
+      </tr>
+    `).join('');
+
+    // Eventos para editar/eliminar
+    $$(".edit").forEach(btn => btn.addEventListener("click", e => editProduct(e.target.dataset.id)));
+    $$(".delete").forEach(btn => btn.addEventListener("click", e => deleteProduct(e.target.dataset.id, adminKey)));
+
+    console.log("[ADMIN] Tabla poblada con éxito");
+
+  } catch (err) {
+    console.error("[ADMIN LOAD FAIL]", err);
+    toast("No se cargaron productos en admin. Revisa consola.", 5000);
+  }
+}
+
+function editProduct(id) {
+  console.log("[ADMIN] Editar producto ID:", id);
+  const p = STATE.productos.find(prod => prod.id === id);
+  if (!p) return toast("Producto no encontrado");
+  $("#editBackdrop").style.display = "block";
+  // Llena campos del editor (tu lógica original)
+  $("#eid").value = p.id;
+  $("#enombre").value = p.nombre;
+  $("#ecat").value = p.categoria;
+  $("#esub").value = p.subcategoria;
+  $("#emarca").value = p.marca;
+  $("#eprecio").value = p.precio;
+  $("#estock").value = p.stock;
+  $("#eactivo").checked = p.activo;
+  $("#edesc").value = p.descripcion;
+  $("#eimg").value = p.img;
+  $("#evideo").value = p.video_url;
+  // Galería (tu lógica)
+  toast("Editando producto " + id);
+  // Agrega saveBtn event si no lo tienes
+}
+
+async function deleteProduct(id, key) {
+  if (!confirm("¿Eliminar producto ID " + id + "?")) return;
+  try {
+    const resp = await apiPost("deleteProduct", { adminKey: key, id });
+    if (resp.ok) {
+      toast("Producto eliminado");
+      loadAdminProducts(key); // Recarga lista
+    }
+  } catch (err) {
+    toast("Error al eliminar: " + err.message);
+  }
 }
 
 /* ===== Router ===== */
@@ -349,7 +460,7 @@ window.addEventListener("DOMContentLoaded", ()=>{
   if(page==="admin") bootAdmin();
   else bootStore();
 
-  // Eventos adicionales
+  // Eventos adicionales para tienda
   $("#goCats").addEventListener("click", ()=> showCatView("Todas"));
   $("#goAll").addEventListener("click", ()=> showCatView("Todas"));
   $("#catsBtn").addEventListener("click", ()=> showCatView("Todas"));
