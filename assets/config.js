@@ -1,6 +1,6 @@
 /**
- * Configuración (NO hace falta editar código)
- * Puedes cambiar esto desde Admin → Configuración (se guarda en este navegador).
+ * Configuración base de la tienda SDComayagua
+ * Puedes cambiar valores desde el panel Admin → Configuración (se guarda en localStorage del navegador)
  */
 window.SDCO_DEFAULTS = {
   "APP_NAME": "Soluciones Digitales Comayagua",
@@ -11,3 +11,5 @@ window.SDCO_DEFAULTS = {
   "CURRENCY": "Lps.",
   "LOCALE": "es-HN"
 };
+
+console.log("config.js cargado – API usada:", window.SDCO_DEFAULTS.API_BASE_DEFAULT);
