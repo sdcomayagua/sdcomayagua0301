@@ -164,6 +164,24 @@ a{color:inherit}
   cursor:pointer;
 }
 
+/* Share button: on mobile show icon to avoid label truncation */
+@media (max-width: 480px){
+  .smallbtn[data-share]{
+    font-size:0; /* hide text label */
+    width:44px;
+    height:44px;
+    padding:0;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .smallbtn[data-share]::before{
+    content:"⤴";
+    font-size:18px;
+    line-height:1;
+  }
+}
+
 .empty{
   margin:18px 0;
   padding:18px;
