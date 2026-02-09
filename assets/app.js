@@ -48,9 +48,9 @@ async function fetchJSON(url, opts){
   return data;
 }
 
-/* ===== Cache local (acelera carga desde Apps Script) ===== */
+/* ===== Cache local ===== */
 const CACHE_KEY_PRODUCTS = "SDCO_PRODUCTS_CACHE_V1";
-const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutos
+const CACHE_TTL_MS = 5 * 60 * 1000;
 
 function getCachedProducts(){
   try{
@@ -69,7 +69,7 @@ function setCachedProducts(data){
   }catch{}
 }
 
-/* ===== API helpers (auto-detect only/resource modes) ===== */
+/* ===== API helpers ===== */
 async function apiGetProducts(){
   const cfg = getConfig();
   const base = cfg.API_BASE_DEFAULT;
@@ -116,10 +116,10 @@ async function apiPost(action, payload){
   });
 }
 
-/* ===== Theme (solo modo claro por ahora) ===== */
+/* ===== Theme ===== */
 function applyTheme(){
   try{ localStorage.setItem("SDCO_THEME","light"); }catch{}
-  document.documentElement.removeAttribute("data-theme");
+  document.documentElement.removeAttribute("data-theme"); 
 }
 function toggleTheme(){ applyTheme(); }
 
@@ -148,15 +148,13 @@ function normalizeProducts(list){
     for(let i=1;i<=8;i++){
       const k = "galeria_"+i;
       if(p[k]) gal.push(p[k]);
-    }
-    for(let i=1;i<=8;i++){
-      const k = "gallery_"+i;
-      if(p[k]) gal.push(p[k]);
+      const k2 = "gallery_"+i;
+      if(p[k2]) gal.push(p[k2]);
     }
     const gallery = [img, ...gal].filter(Boolean);
     return {
-      id: String(p.id ?? p.ID ?? crypto.randomUUID()),
-      nombre: String(p.nombre ?? p.name ?? "Producto"),
+      id: String(p.id ?? p.ID ?? crypto.randomUUID?.() ?? Date.now()),
+      nombre: String(p.nombre ?? p.name ?? "Producto sin nombre"),
       categoria, subcategoria,
       marca: String(p.marca ?? p.brand ?? ""),
       precio: price,
@@ -168,71 +166,45 @@ function normalizeProducts(list){
       video_url: String(p.video_url ?? p.video ?? "")
     };
   });
-
   const visible = items.filter(x => x.activo);
-  const cats = ["Todas", ...Array.from(new Set(visible.map(x=>x.categoria))).sort((a,b)=>a.localeCompare(b,"es"))];
+  const cats = ["Todas", ...new Set(visible.map(x=>x.categoria))].sort();
   STATE.cats = cats;
   return visible;
 }
 
 function deriveSubcats(){
   const cat = STATE.activeCat;
-  if(cat === "Todas") {
-    STATE.subcats = [];
-    STATE.activeSubcat = "Todas";
-    return;
-  }
-  const subs = new Set(STATE.productos.filter(p=>p.categoria===cat).map(p=>p.subcategoria));
+  if(cat === "Todas") return STATE.subcats = [], STATE.activeSubcat = "Todas";
+  const subs = new Set(STATE.productos.filter(p=>p.categoria === cat).map(p=>p.subcategoria));
   STATE.subcats = ["Todas", ...Array.from(subs).sort()];
   STATE.activeSubcat = "Todas";
+  // Render pills
+  const pills = $("#subPills");
+  if(pills) pills.innerHTML = STATE.subcats.map(sub => `<button class="pill" data-sub="${sub}">${sub}</button>`).join('');
 }
 
 function filterAndSort(){
   let res = STATE.productos;
-
-  // Categoría
-  if(STATE.activeCat !== "Todas"){
-    res = res.filter(p => p.categoria === STATE.activeCat);
-  }
-
-  // Subcategoría
-  if(STATE.activeSubcat !== "Todas"){
-    res = res.filter(p => p.subcategoria === STATE.activeSubcat);
-  }
-
-  // Búsqueda
+  if(STATE.activeCat !== "Todas") res = res.filter(p => p.categoria === STATE.activeCat);
+  if(STATE.activeSubcat !== "Todas") res = res.filter(p => p.subcategoria === STATE.activeSubcat);
   if(STATE.q.trim()){
     const q = STATE.q.toLowerCase().trim();
-    res = res.filter(p =>
-      p.nombre.toLowerCase().includes(q) ||
-      p.descripcion.toLowerCase().includes(q) ||
-      p.marca.toLowerCase().includes(q) ||
-      p.categoria.toLowerCase().includes(q) ||
-      p.subcategoria.toLowerCase().includes(q)
-    );
+    res = res.filter(p => p.nombre.toLowerCase().includes(q) || p.descripcion.toLowerCase().includes(q) || p.marca.toLowerCase().includes(q) || p.categoria.toLowerCase().includes(q) || p.subcategoria.toLowerCase().includes(q));
   }
-
-  // Orden
-  if(STATE.sort === "precio_asc"){
-    res.sort((a,b) => Number(a.precio||0) - Number(b.precio||0));
-  } else if(STATE.sort === "precio_desc"){
-    res.sort((a,b) => Number(b.precio||0) - Number(a.precio||0));
-  } // relevancia = orden natural por ahora
-
+  if(STATE.sort === "precio_asc") res.sort((a,b) => Number(a.precio||0) - Number(b.precio||0));
+  else if(STATE.sort === "precio_desc") res.sort((a,b) => Number(b.precio||0) - Number(a.precio||0));
   STATE.filtered = res;
   console.log("[FILTER] Resultado:", res.length, "productos");
 }
 
 function renderProducts(){
   const grid = $("#grid");
-  if(!grid) return;
-
+  if(!grid) return console.warn("[RENDER] No se encontró #grid");
   if(STATE.filtered.length === 0){
     $("#empty").style.display = "block";
     grid.innerHTML = "";
-    return;
+    return console.log("[RENDER] No hay productos para mostrar");
   }
-
   $("#empty").style.display = "none";
   grid.innerHTML = STATE.filtered.map(p => `
     <div class="card" data-id="${p.id}" role="button" tabindex="0">
@@ -241,35 +213,65 @@ function renderProducts(){
       </div>
       <div class="body">
         <div class="title">${p.nombre}</div>
-        ${p.marca ? `<div class="meta"><span class="badge">${p.marca}</span></div>` : ''}
-        <div class="price">
-          <strong>${fmtMoney(p.precio)}</strong>
-          ${p.stock <= 0 ? '<span class="badge bad">Agotado</span>' : ''}
-        </div>
+        <div class="meta">${p.marca ? `<span class="badge">${p.marca}</span>` : ''} <span class="badge">${p.stock > 0 ? `Stock: ${p.stock}` : 'Agotado'}</span></div>
+        <div class="price"><strong>${fmtMoney(p.precio)}</strong></div>
       </div>
     </div>
   `).join('');
+  console.log("[RENDER] Tarjetas renderizadas:", STATE.filtered.length);
+
+  // Agregar eventos para abrir modal
+  $$(".card").forEach(card => {
+    card.addEventListener("click", () => {
+      const id = card.dataset.id;
+      const p = STATE.productos.find(prod => prod.id === id);
+      if(p) openModal(p);
+    });
+  });
+  console.log("[EVENT] Eventos de click agregados a tarjetas");
+}
+
+function openModal(p){
+  if(!p) return console.warn("[MODAL] Producto no encontrado");
+  $("#backdrop").style.display = "block";
+  $("#mTitle").textContent = p.nombre;
+  $("#mSub").textContent = p.categoria + " / " + p.subcategoria;
+  $("#mMainImg").src = p.img || 'https://via.placeholder.com/600?text=Sin+imagen';
+  $("#mMainImg").alt = p.nombre;
+  $("#mPrice").textContent = fmtMoney(p.precio);
+  $("#mDesc").textContent = p.descripcion || "Sin descripción disponible.";
+  $("#mWA").href = `https://wa.me/${getConfig().WHATSAPP_NUMBER}?text=Hola, quiero comprar: ${p.nombre} (ID: ${p.id}) - Precio: ${fmtMoney(p.precio)}`;
+  $("#mVideo").style.display = p.video_url ? "inline-block" : "none";
+  if(p.video_url) $("#mVideo").href = p.video_url;
+
+  const thumbs = $("#mThumbs");
+  thumbs.innerHTML = p.gallery.map((g, idx) => `
+    <img src="${g}" alt="Galería ${idx+1}" class="thumb" data-src="${g}">
+  `).join('');
+  $$(".thumb").forEach(thumb => thumb.addEventListener("click", () => $("#mMainImg").src = thumb.dataset.src));
+
+  console.log("[MODAL] Abierto para producto ID:", p.id);
 }
 
 function renderCategories(){
   const container = $("#catGrid");
-  if(!container) return;
-
-  container.innerHTML = STATE.cats.map(cat => `
+  if(!container) return console.warn("[RENDER CATS] No se encontró #catGrid");
+  container.innerHTML = STATE.cats.slice(1).map(cat => `
     <div class="cat-card" data-cat="${cat}" role="button" tabindex="0">
       <div class="cat-name">${cat}</div>
     </div>
   `).join('');
+  console.log("[RENDER] Categorías renderizadas:", STATE.cats.length - 1);
+
+  $$(".cat-card").forEach(card => {
+    card.addEventListener("click", () => showCatView(card.dataset.cat));
+  });
 }
 
 function updateBreadcrumb(){
   $("#bcCat").textContent = STATE.activeCat;
-  if(STATE.activeCat !== "Todas" && STATE.activeSubcat !== "Todas"){
-    $("#bcSub").textContent = STATE.activeSubcat;
-    $("#bcSubWrap").style.display = "inline";
-  } else {
-    $("#bcSubWrap").style.display = "none";
-  }
+  $("#bcSubWrap").style.display = STATE.activeSubcat !== "Todas" ? "inline" : "none";
+  if(STATE.activeSubcat !== "Todas") $("#bcSub").textContent = STATE.activeSubcat;
 }
 
 function showCatView(cat = "Todas", sub = "Todas"){
@@ -278,11 +280,11 @@ function showCatView(cat = "Todas", sub = "Todas"){
   deriveSubcats();
   filterAndSort();
   renderProducts();
-
   $("#homeCats").style.display = "none";
   $("#catView").style.display = "block";
   $("#catTitle").textContent = cat === "Todas" ? "Todos los productos" : cat;
   updateBreadcrumb();
+  console.log("[VIEW] Mostrando categoría:", cat, sub);
 }
 
 async function bootStore(){
@@ -303,7 +305,7 @@ async function bootStore(){
     console.log("[BOOT] Productos procesados:", STATE.productos.length);
 
     renderCategories();
-    showCatView("Todas", "Todas"); // vista inicial
+    showCatView("Todas", "Todas"); // Vista inicial con todos
 
   } catch(err){
     console.error("[BOOT ERROR]", err.message, err.stack);
@@ -331,42 +333,40 @@ async function bootStore(){
   }
 }
 
-/* ===== Admin (simplificado, solo si existe admin.html) ===== */
+/* ===== Admin ===== */
 function bootAdmin(){
+  // Lógica de admin original (login, list, editor)
   console.log("[BOOT ADMIN] Modo administrador detectado");
-  // Aquí iría el código original de admin si lo tienes separado
-  // Por ahora solo log para confirmar
-  const key = localStorage.getItem("SDCO_ADMIN_KEY");
-  if(key){
-    console.log("[ADMIN] Clave encontrada en localStorage");
-  } else {
-    console.log("[ADMIN] No hay clave guardada → mostrar login");
-  }
+  // Añade aquí tu código original de admin si es necesario, o deja para otro archivo.
 }
 
-/* ===== Router / Init ===== */
+/* ===== Router ===== */
 window.addEventListener("DOMContentLoaded", ()=>{
   console.log("[INIT] DOMContentLoaded - página:", document.body.getAttribute("data-page"));
   applyTheme();
 
   const page = document.body.getAttribute("data-page");
-  if(page === "admin"){
-    bootAdmin();
-  } else {
-    bootStore();
-  }
+  if(page==="admin") bootAdmin();
+  else bootStore();
 
-  // Eventos básicos (puedes expandir)
-  $("#goCats")?.addEventListener("click", ()=> showCatView("Todas"));
-  $("#goAll")?.addEventListener("click", ()=> showCatView("Todas"));
-  $("#catsBtn")?.addEventListener("click", ()=> $("#catView").style.display = "block");
-  $("#adminBtn")?.addEventListener("click", ()=> window.location.href = "admin.html");
-
-  // Más eventos de tu código original (filtros, búsqueda, modal, etc.) se mantienen aquí si los tenías
-  // Ejemplo básico de búsqueda home
-  $("#qHome")?.addEventListener("input", e => {
-    STATE.q = e.target.value;
-    filterAndSort();
-    renderProducts();
+  // Eventos adicionales
+  $("#goCats").addEventListener("click", ()=> showCatView("Todas"));
+  $("#goAll").addEventListener("click", ()=> showCatView("Todas"));
+  $("#catsBtn").addEventListener("click", ()=> showCatView("Todas"));
+  $("#adminBtn").addEventListener("click", ()=> window.location.href = "admin.html");
+  $("#closeModal").addEventListener("click", ()=> $("#backdrop").style.display = "none");
+  $("#backdrop").addEventListener("click", e => { if(e.target === e.currentTarget) $("#backdrop").style.display = "none"; });
+  $("#q").addEventListener("input", e => { STATE.q = e.target.value; filterAndSort(); renderProducts(); });
+  $("#sort").addEventListener("change", e => { STATE.sort = e.target.value; filterAndSort(); renderProducts(); });
+  $("#qHome").addEventListener("input", e => { STATE.q = e.target.value; showCatView("Todas"); filterAndSort(); renderProducts(); });
+  $("#clearHome").addEventListener("click", () => { $("#qHome").value = ""; STATE.q = ""; filterAndSort(); renderProducts(); });
+  $("#bcHome").addEventListener("click", () => { showCatView("Todas"); });
+  $("#subPills").addEventListener("click", e => {
+    if(e.target.dataset.sub){
+      STATE.activeSubcat = e.target.dataset.sub;
+      filterAndSort();
+      renderProducts();
+      updateBreadcrumb();
+    }
   });
 });
