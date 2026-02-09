@@ -496,6 +496,37 @@ function bootSlider(){
     document.getElementById("homeCats")?.scrollIntoView({behavior:"smooth"});
   });
 }
+
+/* Auto-rotación para carruseles horizontales (1x1) */
+const HSCROLL_TIMERS = new Map();
+function bootHScrollAuto(ids, intervalMs=3000){
+  (ids||[]).forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    // limpia timer previo
+    const prev = HSCROLL_TIMERS.get(id);
+    if(prev) clearInterval(prev);
+
+    // pausa si el user toca/scroll
+    let pausedUntil = 0;
+    const pause = ()=>{ pausedUntil = Date.now() + 5000; };
+    el.addEventListener("touchstart", pause, {passive:true});
+    el.addEventListener("wheel", pause, {passive:true});
+    el.addEventListener("scroll", ()=>{ /* user scrolls */ }, {passive:true});
+
+    const timer = setInterval(()=>{
+      if(document.hidden) return;
+      if(Date.now() < pausedUntil) return;
+      const cards = el.querySelectorAll(".card");
+      if(!cards.length) return;
+      const step = el.clientWidth;
+      // próximo punto de snap
+      const next = (el.scrollLeft + step) >= (el.scrollWidth - el.clientWidth - 4) ? 0 : (el.scrollLeft + step);
+      el.scrollTo({left: next, behavior: "smooth"});
+    }, intervalMs);
+    HSCROLL_TIMERS.set(id, timer);
+  });
+}
 function pickFeatured(max=8){
   // Prefer in-stock, then random-ish stable
   const list = STATE.productos.filter(p=>p.stock>0);
@@ -766,6 +797,26 @@ function openModal(p){
   const wa = "https://wa.me/" + cfg.WHATSAPP_NUMBER + "?text=" + waText;
   $("#mWA").href = wa;
 
+  // Video del producto (si existe)
+  const vbtn = $("#mVideo");
+  const vurl = String(p.video_url || p.video || "").trim();
+  if(vbtn){
+    if(vurl){
+      const lower = vurl.toLowerCase();
+      let label = "Ver video";
+      if(lower.includes("tiktok")) label = "Ver en TikTok";
+      else if(lower.includes("youtu")) label = "Ver en YouTube";
+      else if(lower.includes("facebook") || lower.includes("fb.watch")) label = "Ver en Facebook";
+      else if(lower.includes("instagram") || lower.includes("instagr.am")) label = "Ver en Instagram";
+      vbtn.textContent = label;
+      vbtn.href = vurl;
+      vbtn.style.display = "inline-flex";
+    }else{
+      vbtn.style.display = "none";
+      vbtn.href = "#";
+    }
+  }
+
   $("#mCopy").onclick = async ()=>{
     try{ await navigator.clipboard.writeText(buildProductUrl(p)); toast("Link copiado"); }catch{ toast("No se pudo copiar"); }
   };
@@ -792,7 +843,14 @@ async function bootStore(){
   if(waTop) waTop.href = "https://wa.me/" + cfg.WHATSAPP_NUMBER;
   const fab = document.getElementById("waFab");
   if(fab) fab.href = "https://wa.me/" + cfg.WHATSAPP_NUMBER;
-  $("#adminBtn")?.addEventListener("click", ()=> location.href = "admin.html");
+  $("#adminBtn")?.addEventListener("click", ()=>{
+    const k = prompt("Clave de ADMIN:") || "";
+    const key = k.trim();
+    if(!key) return;
+    if(key !== "199311" && key !== "202528") return toast("Clave incorrecta");
+    localStorage.setItem("SDCO_ADMIN_KEY", key);
+    location.href = "admin.html";
+  });
   $("#closeModal")?.addEventListener("click", closeModal);
   $("#backdrop")?.addEventListener("click", (e)=>{ if(e.target.id==="backdrop") closeModal(); });
   document.addEventListener("keydown", (e)=>{ if(e.key==="Escape") closeModal(); });
@@ -833,15 +891,7 @@ async function bootStore(){
   $("#q")?.addEventListener("input", (e)=>{ STATE.q = e.target.value; applyFilters(); });
   $("#sort")?.addEventListener("change", (e)=>{ STATE.sort = e.target.value; applyFilters(); });
 
-  // Configuración: oculta para clientes. Se abre solo desde ADMIN con clave.
-  document.getElementById("adminBtn")?.addEventListener("click", ()=>{
-    const pass = String(prompt("ADMIN: ingresa clave") || "").trim();
-    if(pass === "199311" || pass === "202528"){
-      openConfigDialog();
-    }else{
-      toast("Clave incorrecta");
-    }
-  });
+  // Configuración avanzada se maneja desde el panel ADMIN
   document.getElementById("catsBtn")?.addEventListener("click", ()=>{ document.getElementById("homeCats")?.scrollIntoView({behavior:"smooth"}); });
   $("#cfgSave")?.addEventListener("click", ()=> saveConfigFromDialog());
   $("#cfgClose")?.addEventListener("click", ()=> closeConfigDialog());
@@ -863,6 +913,7 @@ async function bootStore(){
     bootSlider();
     renderFeatured();
     renderHomeSections();
+    bootHScrollAuto(["featuredGrid","ofertasGrid","nuevosGrid","celGrid","hogarGrid"], 3000);
     hookHomeSearch();
     showHome();
   }
@@ -878,6 +929,7 @@ async function bootStore(){
     bootSlider();
     renderFeatured();
     renderHomeSections();
+    bootHScrollAuto(["featuredGrid","ofertasGrid","nuevosGrid","celGrid","hogarGrid"], 3000);
     hookHomeSearch();
     showHome();
 
@@ -962,12 +1014,22 @@ async function bootAdmin(){
     toast("Configuración guardada");
   });
 
+  // Configuración como botón (móvil): muestra/oculta panel
+  $("#cfgToggle")?.addEventListener("click", ()=>{
+    const panel = $("#cfgPanel");
+    if(!panel) return;
+    const open = panel.style.display !== "none";
+    panel.style.display = open ? "none" : "block";
+    $("#cfgToggle")?.setAttribute("aria-expanded", String(!open));
+  });
+
   const key = localStorage.getItem("SDCO_ADMIN_KEY");
   if(!key){
     $("#loginBox").style.display="block";
     $("#loginBtn").addEventListener("click", ()=>{
       const k = $("#adminKey").value.trim();
       if(!k) return toast("Escribe tu clave");
+      if(k !== "199311" && k !== "202528") return toast("Clave incorrecta");
       localStorage.setItem("SDCO_ADMIN_KEY", k);
       location.reload();
     });
@@ -982,17 +1044,19 @@ async function bootAdmin(){
   $("#saveBtn")?.addEventListener("click", ()=>saveEditor());
   $("#delBtn")?.addEventListener("click", ()=>deleteEditor());
   $("#closeEdit")?.addEventListener("click", ()=>closeEditor());
+  $("#closeEdit2")?.addEventListener("click", ()=>closeEditor());
   $("#imgAddBtn")?.addEventListener("click", ()=>addGalleryField());
   $("#imgUpload")?.addEventListener("change", (e)=>uploadFiles(e.target.files));
 
   $("#aq")?.addEventListener("input", ()=>renderAdminTable());
-  $("#afCat")?.addEventListener("change", ()=>renderAdminTable());
+  $("#afCat")?.addEventListener("change", ()=>{ updateAdminSubOptions(); renderAdminTable(); });
+  $("#afSub")?.addEventListener("change", ()=>renderAdminTable());
   $("#afActive")?.addEventListener("change", ()=>renderAdminTable());
 
   await loadAdminList();
 }
 
-let ADMIN = { all:[], view:[], cats:[], editing:null };
+let ADMIN = { all:[], view:[], cats:[], subByCat:{}, editing:null };
 
 async function loadAdminList(){
   try{
@@ -1018,6 +1082,18 @@ async function loadAdminList(){
     ADMIN.cats = cats;
     $("#afCat").innerHTML = cats.map(c=>`<option>${escapeHtml(c)}</option>`).join("");
 
+    // Subcategorías por categoría
+    ADMIN.subByCat = {};
+    ADMIN.all.forEach(p=>{
+      const c = p.categoria || "Otros";
+      const s = p.subcategoria || "General";
+      if(!ADMIN.subByCat[c]) ADMIN.subByCat[c] = new Set();
+      ADMIN.subByCat[c].add(s);
+    });
+
+    // Inicializa subcategorías
+    updateAdminSubOptions();
+
     renderAdminTable();
     toast("Productos cargados");
   }catch(e){
@@ -1029,13 +1105,30 @@ async function loadAdminList(){
   }
 }
 
+function updateAdminSubOptions(){
+  const cat = $("#afCat")?.value || "Todas";
+  const sel = $("#afSub");
+  if(!sel) return;
+  if(cat === "Todas"){
+    sel.style.display = "none";
+    sel.innerHTML = `<option value="Todas">Todas</option>`;
+    return;
+  }
+  const set = ADMIN.subByCat[cat] || new Set();
+  const subs = ["Todas", ...Array.from(set).sort((a,b)=>a.localeCompare(b,"es"))];
+  sel.innerHTML = subs.map(s=>`<option>${escapeHtml(s)}</option>`).join("");
+  sel.style.display = "";
+}
+
 function renderAdminTable(){
   const q = ($("#aq").value||"").trim().toLowerCase();
   const cat = $("#afCat").value || "Todas";
+  const sub = $("#afSub")?.value || "Todas";
   const act = $("#afActive").value || "todos";
 
   let items = [...ADMIN.all];
   if(cat!=="Todas") items = items.filter(x=>x.categoria===cat);
+  if(cat!=="Todas" && sub!=="Todas") items = items.filter(x=>x.subcategoria===sub);
   if(act==="activos") items = items.filter(x=>String(x.activo)===String(true));
   if(act==="inactivos") items = items.filter(x=>!x.activo);
   if(q) items = items.filter(x =>
@@ -1051,13 +1144,22 @@ function renderAdminTable(){
   const tbody = $("#atable");
   tbody.innerHTML = items.map(p=>{
     const priceText = (p.precio==="" || p.precio===null || p.precio===undefined) ? "Consultar" : fmtMoney(p.precio, cfg.CURRENCY, cfg.LOCALE);
+    const img = (p.img||"").trim();
     return `
       <tr>
-        <td><strong>${escapeHtml(p.nombre)}</strong><br><small>${escapeHtml(p.categoria)} • ${escapeHtml(p.subcategoria)}</small></td>
-        <td>${escapeHtml(priceText)}</td>
-        <td>${escapeHtml(String(p.stock||0))}</td>
-        <td>${p.activo ? "<span class='badge ok'>Activo</span>" : "<span class='badge bad'>Inactivo</span>"}</td>
-        <td class="tr-actions">
+        <td data-label="Producto">
+          <div class="prodcell">
+            <div class="athumb">${img ? `<img src="${escapeHtml(img)}" alt="${escapeHtml(p.nombre)}">` : `<span>📦</span>`}</div>
+            <div>
+              <strong>${escapeHtml(p.nombre)}</strong><br>
+              <small>${escapeHtml(p.categoria)} • ${escapeHtml(p.subcategoria)}</small>
+            </div>
+          </div>
+        </td>
+        <td data-label="Precio">${escapeHtml(priceText)}</td>
+        <td data-label="Stock">${escapeHtml(String(p.stock||0))}</td>
+        <td data-label="Estado">${p.activo ? "<span class='badge ok'>Activo</span>" : "<span class='badge bad'>Inactivo</span>"}</td>
+        <td class="tr-actions" data-label="Acciones">
           <button class="btn" data-edit="${escapeHtml(p.id)}">Editar</button>
         </td>
       </tr>
@@ -1107,6 +1209,23 @@ function openEditor(p){
   $("#edesc").value = ADMIN.editing.descripcion || "";
   $("#eimg").value = ADMIN.editing.img || "";
   $("#evideo").value = ADMIN.editing.video_url || "";
+
+  // Vista previa de imagen principal
+  const prev = $("#eimgPreview");
+  if(prev){
+    const src = (ADMIN.editing.img || "").trim();
+    prev.src = src || "";
+    prev.style.display = src ? "block" : "none";
+  }
+
+  // Actualizar vista previa al cambiar URL
+  const eimg = $("#eimg");
+  if(eimg){
+    eimg.oninput = ()=>{
+      const src = eimg.value.trim();
+      if(prev){ prev.src = src || ""; prev.style.display = src ? "block" : "none"; }
+    };
+  }
 
   // gallery
   const g = $("#galleryFields");

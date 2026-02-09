@@ -242,6 +242,44 @@ th{font-size:12px;color:var(--muted);text-align:left}
 td small{color:var(--muted)}
 .tr-actions{display:flex;gap:8px}
 .inline{width:110px}
+
+/* Admin: tabla más linda + responsive */
+.prodcell{display:flex;gap:10px;align-items:flex-start}
+.athumb{
+  width:54px;height:54px;flex:0 0 54px;
+  border-radius:16px;
+  overflow:hidden;
+  border:1px solid var(--border);
+  background:var(--surface);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow: var(--shadow);
+}
+.athumb img{width:100%;height:100%;object-fit:cover;display:block}
+.imgprev{
+  margin-top:8px;
+  height:160px;
+  border-radius:18px;
+  overflow:hidden;
+  border:1px solid var(--border);
+  background:var(--surface);
+  display:flex;align-items:center;justify-content:center;
+}
+.imgprev img{width:100%;height:100%;object-fit:cover;display:block}
+
+@media (max-width: 720px){
+  table thead{display:none}
+  table,tbody,tr,td,th{display:block;width:100%}
+  tr{border-bottom:1px solid var(--border);padding:6px 0}
+  td{border:0;padding:8px 12px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+  td::before{content:attr(data-label);font-size:12px;color:var(--muted);min-width:86px;padding-top:2px}
+  td[data-label="Producto"]{padding-top:12px}
+  .tr-actions{justify-content:flex-end}
+
+  .modal-admin{width:calc(100vw - 16px);max-width:none}
+  .modal-admin .modal-body{grid-template-columns:1fr !important;max-height:calc(100vh - 160px);overflow:auto}
+  .modal-admin .modal-head{position:sticky;top:0;background:var(--card);z-index:3}
+  .modal-foot-admin{position:sticky;bottom:0;background:var(--card);z-index:3;border-top:1px solid var(--border)}
+}
 .toast{
   position:fixed;left:16px;bottom:16px;
   background:var(--card);border:1px solid var(--border);
@@ -544,6 +582,12 @@ td small{color:var(--muted)}
 .hscroll::-webkit-scrollbar{height:7px}
 .hscroll .card{min-width:240px;max-width:240px;scroll-snap-align:start}
 @media (max-width: 520px){ .hscroll .card{min-width: 82vw; max-width:82vw;} }
+
+/* Cards compactas en secciones horizontales */
+.hscroll .card{min-height:240px}
+.hscroll .card .img{aspect-ratio: 16/10}
+.hscroll .card .meta{gap:6px}
+.hscroll .card .price{font-size:20px}
 
 .section .sh .btnlink{
   border:0;background:transparent;color:var(--primary);
