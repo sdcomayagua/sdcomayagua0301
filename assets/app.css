@@ -225,6 +225,15 @@ a{color:inherit}
   color:var(--muted);font-size:12px
 }
 
+
+/* Admin tweaks: logo-only header + nicer spacing */
+body[data-page="admin"] .brand{gap:10px}
+body[data-page="admin"] .brand > div{display:none !important;} /* hide text next to logo */
+body[data-page="admin"] .brandlogo{width:140px;max-height:46px;object-fit:contain}
+@media (max-width: 560px){
+  body[data-page="admin"] .brandlogo{width:150px;max-height:42px}
+}
+
 /* Admin */
 .body-admin{background:var(--surface)}
 body[data-page="admin"]{background:var(--surface)}
@@ -315,6 +324,24 @@ td small{color:var(--muted)}
 }
 .imgprev img{width:100%;height:100%;object-fit:cover;display:block}
 
+.aval{
+  display:inline-flex;
+  align-items:center;
+  justify-content:flex-end;
+  min-width:92px;
+  padding:6px 10px;
+  border-radius:14px;
+  background: color-mix(in srgb, var(--surface) 70%, white);
+  border:1px solid var(--border);
+  box-shadow: 0 6px 14px rgba(2,6,23,.06);
+  text-align:right;
+}
+.aval.money{font-weight:800}
+.aval.num{font-weight:700}
+@media (max-width: 560px){
+  .aval{min-width:110px}
+}
+
 
 /* Admin modal layout fixes (scroll + sticky footer on mobile) */
 .modal-admin{display:flex;flex-direction:column;max-height:calc(100dvh - 16px);height:min(900px, calc(100dvh - 16px));}
@@ -340,7 +367,7 @@ td small{color:var(--muted)}
     overflow:hidden;
   }
   tbody{padding:8px 0}
-  td{border:0;padding:10px 12px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+  td{border:0;padding:12px 16px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
   td::before{content:attr(data-label);font-size:12px;color:var(--muted);min-width:86px;padding-top:2px}
   td[data-label="Producto"]{padding-top:12px}
   .tr-actions{justify-content:flex-end}

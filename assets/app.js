@@ -1156,8 +1156,8 @@ function renderAdminTable(){
             </div>
           </div>
         </td>
-        <td data-label="Precio">${escapeHtml(priceText)}</td>
-        <td data-label="Stock">${escapeHtml(String(p.stock||0))}</td>
+        <td data-label="Precio"><span class="aval money">${escapeHtml(priceText)}</span></td>
+        <td data-label="Stock"><span class="aval num">${escapeHtml(String(p.stock||0))}</span></td>
         <td data-label="Estado">${p.activo ? "<span class='badge ok'>Activo</span>" : "<span class='badge bad'>Inactivo</span>"}</td>
         <td class="tr-actions" data-label="Acciones">
           <button class="btn" data-edit="${escapeHtml(p.id)}">Editar</button>
