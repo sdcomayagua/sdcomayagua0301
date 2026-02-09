@@ -485,39 +485,21 @@ function pickFeatured(max=8){
 }
 
 function renderFeatured(){
-  const sec = document.getElementById("featuredSec");
-  const grid = document.getElementById("featuredGrid");
-  if(!sec || !grid) return;
+  const grid = document.getElementById("featGrid");
+  if(!grid) return;
 
-  const items = pickFeatured(8);
-  if(!items.length){
-    sec.style.display = "none";
-    return;
-  }
-  sec.style.display = "block";
+  const items = pickFeatured().slice(0, 3); // ✅ solo 3 para que no se haga larguísimo
+  grid.classList.add("compact-grid");
 
   const cfg = getConfig();
   grid.innerHTML = items.map(p=>{
     const priceText = (p.precio==="" || p.precio===null || p.precio===undefined) ? "Consultar" : fmtMoney(p.precio, cfg.CURRENCY, cfg.LOCALE);
     const img = p.img || (p.gallery[0]||"");
-    const tags = [];
-    if(String(p.nombre||"").toLowerCase().includes("oferta")) tags.push("off");
-    if(String(p.nombre||"").toLowerCase().includes("nuevo")) tags.push("new");
-    if(p.stock>0 && p.stock<=2) tags.push("hot");
-    const tagHtml = tags.length ? `<div class="badges">${tags.map(t=>{
-      const label = t==="off"?"OFERTA":t==="new"?"NUEVO":"HOT";
-      return `<span class="tag ${t}">${label}</span>`;
-    }).join("")}</div>` : "";
-
     return `
-      <article class="card" data-id="${escapeHtml(p.id)}">
-        <div class="img">${tagHtml}${img ? `<img src="${escapeHtml(img)}" alt="${escapeHtml(p.nombre)}">` : `<span class="pill">Sin imagen</span>`}</div>
+      <article class="card compact" data-id="${escapeHtml(p.id)}">
+        <div class="img">${img ? `<img src="${escapeHtml(img)}" alt="${escapeHtml(p.nombre)}">` : `<span class="pill">Sin imagen</span>`}</div>
         <div class="body">
           <div class="title">${escapeHtml(p.nombre)}</div>
-          <div class="meta">
-            <span class="badge ${p.stock>0 ? "ok":"bad"}">${p.stock>0 ? "Disponible" : "Agotado"}</span>
-            <span class="badge">${escapeHtml(p.categoria)}</span>
-          </div>
           <div class="price">
             <strong>${escapeHtml(priceText)}</strong>
             <button class="smallbtn" data-share="1" title="Compartir">Compartir</button>
@@ -527,7 +509,7 @@ function renderFeatured(){
     `;
   }).join("");
 
-  // bind same behavior as main grid
+  // Clicks
   $$(".card", grid).forEach(card=>{
     card.addEventListener("click", (e)=>{
       if(e.target?.dataset?.share) return;
@@ -549,7 +531,7 @@ function renderFeatured(){
       const url = buildProductUrl(p);
       try{
         if(navigator.share){
-          await navigator.share({ title:p.nombre, text: p.nombre, url });
+          await navigator.share({ title:p.nombre, text:p.nombre, url });
         }else{
           await navigator.clipboard.writeText(url);
           toast("Link copiado");
