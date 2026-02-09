@@ -28,12 +28,12 @@ function setLS(key, value){
 }
 
 function getConfig(){
-  const stored = getLS("SDCO_CONFIG_V2", null);
+  const stored = getLS("SDCO_CONFIG", null);
   return Object.assign({}, window.SDCO_DEFAULTS || {}, stored || {});
 }
 function setConfig(patch){
   const next = Object.assign({}, getConfig(), patch);
-  setLS("SDCO_CONFIG_V2", next);
+  setLS("SDCO_CONFIG", next);
   return next;
 }
 
@@ -117,13 +117,6 @@ function toggleTheme(){
   const next = cur==="dark" ? "light":"dark";
   setLS("SDCO_THEME", next);
   applyTheme();
-}
-
-
-/* ===== View helpers ===== */
-function setView(name){
-  document.body.classList.remove("view-home","view-cat");
-  document.body.classList.add(name==="cat" ? "view-cat" : "view-home");
 }
 
 /* ===== Storefront ===== */
@@ -233,7 +226,6 @@ function updateBreadcrumb(){
 }
 
 function showCategoryView(){
-  setView('cat');
   $("#homeCats").style.display = "none";
   $("#catView").style.display = "block";
   $("#catTitle").textContent = STATE.activeCat === "Todas" ? "Todos los productos" : STATE.activeCat;
@@ -409,43 +401,24 @@ function showSection(secId, shouldShow){
 }
 
 function renderHomeSections(){
-  const prods = (STATE.productos||[]).filter(p=>Number(p.activo||1)===1);
-  // Helpers
-  const pick = (arr, n)=>arr.slice(0, n);
-  const sortNew = (arr)=>arr.slice().sort((a,b)=>Number(b.created_at||0)-Number(a.created_at||0));
-  const miniCard = (p)=>`
-    <article class="card mini-card" data-id="${escapeHtml(p.id)}">
-      <div class="mini-img" style="background-image:url('${escapeHtml(p.img||"")}')"></div>
-      <div class="mini-body">
-        <div class="mini-title">${escapeHtml(p.nombre||"")}</div>
-        <div class="mini-meta">
-          <span class="badge ${Number(p.stock||0)>0?'ok':'out'}">${Number(p.stock||0)>0?'Disponible':'Agotado'}</span>
-          <span class="price">${formatMoney(p.precio)}</span>
-        </div>
-        <button class="mini-btn" data-action="share">Compartir</button>
-      </div>
-    </article>`;
-  const renderMiniGrid = (gridId, items, limit=3)=>{
-    const el = document.getElementById(gridId);
-    if(!el) return;
-    const list = pick(items, limit);
-    el.innerHTML = list.map(miniCard).join("");
-    el.closest("section") && (el.closest("section").style.display = list.length ? "" : "none");
-  };
+  const ofertas = STATE.productos.filter(p=>byTextMatch(p, ["oferta","promo","promoción","combo","descuento"]));
+  const nuevos = STATE.productos.filter(p=>byTextMatch(p, ["nuevo","new"]));
+  const cel = STATE.productos.filter(p=>byTextMatch(p, ["cel", "telefono", "teléfono", "android", "iphone", "cargador", "cable", "usb", "tipo c", "type c", "audif", "bluetooth"]));
+  const hogar = STATE.productos.filter(p=>byTextMatch(p, ["hogar","cocina","casa","licuadora","lampara","lámpara","organizador"]));
 
-  // Featured: newest products
-  renderMiniGrid("featuredGrid", sortNew(prods), 3);
+  const pick = (arr)=>takeCards(arr.filter(p=>p.stock>0).concat(arr.filter(p=>p.stock<=0)), 10);
 
-  // Ofertas: oferta flag or keywords
-  const ofertas = prods.filter(p=>Number(p.oferta||0)===1 || byTextMatch(p, ["oferta","promo","promoción","descuento","combo"]));
-  renderMiniGrid("ofertasGrid", sortNew(ofertas), 3);
+  showSection("secOfertas", ofertas.length>0);
+  if(ofertas.length) renderCardsInto("ofertasGrid", pick(ofertas));
 
-  // Nuevos: nuevo flag or recently added
-  const nuevos = prods.filter(p=>Number(p.nuevo||0)===1);
-  renderMiniGrid("nuevosGrid", sortNew(nuevos.length? nuevos: prods), 3);
+  showSection("secNuevos", nuevos.length>0);
+  if(nuevos.length) renderCardsInto("nuevosGrid", pick(nuevos));
 
-  // Categories tiles
-  renderChips();
+  showSection("secCel", cel.length>0);
+  if(cel.length) renderCardsInto("celGrid", pick(cel));
+
+  showSection("secHogar", hogar.length>0);
+  if(hogar.length) renderCardsInto("hogarGrid", pick(hogar));
 }
 
 function bootSlider(){
@@ -1258,14 +1231,4 @@ window.addEventListener("DOMContentLoaded", ()=>{
   const page = document.body.getAttribute("data-page");
   if(page==="admin") bootAdmin();
   else bootStore();
-});
-
-function showHomeView(){ setView('home'); }
-
-document.addEventListener("DOMContentLoaded", ()=>{ setView('home'); applyTheme(); });
-
-// v7 bindings
-document.getElementById("catsBtn")?.addEventListener("click", ()=>{
-  showHomeView();
-  document.getElementById("homeCats")?.scrollIntoView({behavior:"smooth"});
 });
