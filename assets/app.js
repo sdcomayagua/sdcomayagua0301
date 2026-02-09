@@ -28,12 +28,12 @@ function setLS(key, value){
 }
 
 function getConfig(){
-  const stored = getLS("SDCO_CONFIG", null);
+  const stored = getLS("SDCO_CONFIG_V2", null);
   return Object.assign({}, window.SDCO_DEFAULTS || {}, stored || {});
 }
 function setConfig(patch){
   const next = Object.assign({}, getConfig(), patch);
-  setLS("SDCO_CONFIG", next);
+  setLS("SDCO_CONFIG_V2", next);
   return next;
 }
 

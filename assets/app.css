@@ -726,3 +726,35 @@ body.view-home #homeView{display:block}
 
 /* Dark mode: asegurar que el fondo cambie */
 html[data-theme="dark"] body{background:var(--bg) !important}
+
+
+/* ===== v8: Header móvil limpio (2 filas) ===== */
+.head8{display:flex;flex-direction:column;gap:10px;padding:10px 0}
+.h8-row{display:flex;align-items:center;gap:10px}
+.h8-top{justify-content:space-between}
+.h8-brand{display:flex;justify-content:center;align-items:center;flex:1;min-width:0}
+.h8-actions{display:flex;align-items:center;gap:10px}
+.topbar .btn.icon{width:44px;height:44px;border-radius:14px}
+
+.topbar .hlogo{
+  max-width:240px;
+  width:100%;
+  height:auto;
+  object-fit:contain;
+  display:block;
+}
+@media (max-width: 520px){
+  .topbar .hlogo{max-width:200px;}
+}
+
+.h8-search{
+  border:1px solid var(--border);
+  background: color-mix(in srgb, var(--card) 92%, transparent);
+  border-radius: 16px;
+  padding:8px;
+}
+.h8-search .hsearch{border:0;background:transparent;flex:1;padding:10px 10px}
+.h8-search .hclear{width:42px;height:42px;border-radius:12px}
+
+/* Dark mode hardening */
+html[data-theme="dark"] body{background:var(--bg) !important;color:var(--text) !important}
