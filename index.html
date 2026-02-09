@@ -26,21 +26,28 @@
   </noscript>
 
   <header class="topbar">
-    <div class="container topbar-inner">
-      <div class="brand">
-        <div class="logo">SD</div>
-        <div>
-          <h1 id="brandName">SDComayagua</h1>
-          <p id="brandSub">Pedidos por WhatsApp</p>
-        </div>
-      </div>
-      <div class="actions">
-        <a class="btn primary" id="waTop" href="#" target="_blank">WhatsApp</a>
-        <button class="btn icon" id="themeBtn" title="Modo claro/oscuro">☾</button>
-        <button class="btn" id="adminBtn">Admin</button>
+  <div class="container topbar-inner retailhead">
+    <div class="brand retailbrand">
+      <div class="logo retaillogo" aria-hidden="true">SD</div>
+      <div class="brandtext">
+        <h1 id="brandName">SDComayagua</h1>
+        <p id="brandSub">Tienda en Comayagua • Pedidos por WhatsApp</p>
       </div>
     </div>
-  </header>
+
+    <div class="headsearch" role="search" aria-label="Buscar productos">
+      <input class="input" id="qHome" placeholder="Buscar productos (ej: audífonos, cargador, USB)..." />
+      <button class="btn icon" id="clearHome" type="button" title="Limpiar búsqueda" aria-label="Limpiar">✕</button>
+    </div>
+
+    <div class="headactions">
+      <button class="btn" id="catsBtn" type="button">Categorías</button>
+      <a class="btn primary" id="waTop" href="#" target="_blank" rel="noopener">WhatsApp</a>
+      <button class="btn icon" id="themeBtn" type="button" title="Modo claro/oscuro" aria-label="Tema">☾</button>
+      <button class="btn" id="cfgBtnTop" type="button">Config</button>
+    </div>
+  </div>
+</header>
 
   <main class="container">
 
@@ -87,7 +94,7 @@
         <div class="pill">💳 Pago según acuerdo</div>
       </div>
       <div class="right">
-        <input class="input searchbig" id="qHome" placeholder="Buscar en toda la tienda (ej: audífonos, cargador, USB)...">
+        <div class="pill">🛡️ Compra segura</div>
       </div>
     </div>
 
