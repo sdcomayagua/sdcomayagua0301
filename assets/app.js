@@ -7,7 +7,7 @@ function fmtMoney(value, currency="Lps.", locale="es-HN"){
   const n = Number(value || 0);
   if(!isFinite(n)) return String(value ?? "");
   try{
-    return currency + " " + n.toLocaleString(locale, {minimumFractionDigits:0, maximumFractionDigits:2});
+    return currency + "\u00A0" + n.toLocaleString(locale, {minimumFractionDigits:0, maximumFractionDigits:2});
   }catch{ return currency + " " + n; }
 }
 

@@ -317,13 +317,13 @@ td small{color:var(--muted)}
 
 
 /* Admin modal layout fixes (scroll + sticky footer on mobile) */
-.modal-admin{display:flex;flex-direction:column}
-.modal-admin .modal-body{flex:1;overflow:auto;-webkit-overflow-scrolling:touch}
-.modal-admin .modal-foot-admin{flex:0 0 auto}
+.modal-admin{display:flex;flex-direction:column;max-height:calc(100dvh - 16px);height:min(900px, calc(100dvh - 16px));}
+.modal-admin .modal-body{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;padding-bottom:12px}
+.modal-admin .modal-foot-admin{flex:0 0 auto;position:sticky;bottom:0;z-index:10;background:var(--card);border-top:1px solid var(--border);padding-bottom:calc(12px + env(safe-area-inset-bottom));}
 @media (max-width: 720px){
   /* Fullscreen-friendly admin editor on mobile */
   #editBackdrop.backdrop{padding:6px;align-items:stretch}
-  .modal-admin{border-radius:22px}
+  .modal-admin{border-radius:22px;height:calc(100dvh - 12px);max-height:calc(100dvh - 12px)}
   .modal-admin .modal-head{padding:14px 12px 10px}
   .modal-admin .modal-head .btn.icon{width:46px;height:46px;font-size:18px}
   .modal-admin .modal-body{padding:12px}
