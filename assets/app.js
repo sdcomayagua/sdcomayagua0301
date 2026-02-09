@@ -443,6 +443,15 @@ function bootSlider(){
     }
     tEl.textContent = s.title || "Promoción";
     pEl.textContent = s.text || "";
+
+    // CTA dinámico según el slide (pedid...)
+    const cta = document.getElementById("slideCTA");
+    if(cta){
+      if(i===0) cta.textContent = "Ver ofertas";
+      else if(i===1) cta.textContent = "Ver tecnología";
+      else if(i===2) cta.textContent = "Ver hogar";
+      else cta.textContent = "Ver productos";
+    }
     if(dots){
       dots.innerHTML = slides.map((_,j)=>`<button class="dot ${j===i?"active":""}" data-i="${j}" aria-label="Slide ${j+1}"></button>`).join("");
       $$(".dot", dots).forEach(btn=>btn.addEventListener("click", ()=>setSlide(Number(btn.dataset.i||0))));
@@ -453,15 +462,35 @@ function bootSlider(){
   clearInterval(window.__slideT);
   window.__slideT = setInterval(()=>setSlide((i+1)%slides.length), 5000);
 
+  // CTA principal: cambia acción según el slide actual.
   document.getElementById("slideCTA")?.addEventListener("click", ()=>{
-    const sec = document.getElementById("secOfertas");
-    if(sec && sec.style.display!=="none"){
-      sec.scrollIntoView({behavior:"smooth"});
-    }else{
+    if(i===0){
+      const sec = document.getElementById("secOfertas");
+      if(sec && sec.style.display!=="none"){
+        sec.scrollIntoView({behavior:"smooth"});
+        return;
+      }
       STATE.activeCat="Todas"; STATE.activeSubcat="Todas"; showCategoryView();
       const q = document.getElementById("q");
       if(q){ q.value="oferta"; STATE.q="oferta"; applyFilters(); }
+      return;
     }
+    if(i===1){
+      const tech = (STATE.cats||[]).find(c=>String(c).toLowerCase().includes("tecn"));
+      STATE.activeCat = tech || "Todas";
+      STATE.activeSubcat = "Todas";
+      showCategoryView();
+      return;
+    }
+    if(i===2){
+      const cat = (STATE.cats||[]).find(c=>String(c).toLowerCase().includes("hogar") || String(c).toLowerCase().includes("cocina"));
+      STATE.activeCat = cat || "Todas";
+      STATE.activeSubcat = "Todas";
+      showCategoryView();
+      return;
+    }
+    // fallback
+    STATE.activeCat="Todas"; STATE.activeSubcat="Todas"; showCategoryView();
   });
   document.getElementById("slideCTA2")?.addEventListener("click", ()=>{
     document.getElementById("homeCats")?.scrollIntoView({behavior:"smooth"});
@@ -804,8 +833,15 @@ async function bootStore(){
   $("#q")?.addEventListener("input", (e)=>{ STATE.q = e.target.value; applyFilters(); });
   $("#sort")?.addEventListener("change", (e)=>{ STATE.sort = e.target.value; applyFilters(); });
 
-  $("#cfgBtn")?.addEventListener("click", ()=> openConfigDialog());
-  document.getElementById("cfgBtnTop")?.addEventListener("click", ()=> openConfigDialog());
+  // Configuración: oculta para clientes. Se abre solo desde ADMIN con clave.
+  document.getElementById("adminBtn")?.addEventListener("click", ()=>{
+    const pass = String(prompt("ADMIN: ingresa clave") || "").trim();
+    if(pass === "199311" || pass === "202528"){
+      openConfigDialog();
+    }else{
+      toast("Clave incorrecta");
+    }
+  });
   document.getElementById("catsBtn")?.addEventListener("click", ()=>{ document.getElementById("homeCats")?.scrollIntoView({behavior:"smooth"}); });
   $("#cfgSave")?.addEventListener("click", ()=> saveConfigFromDialog());
   $("#cfgClose")?.addEventListener("click", ()=> closeConfigDialog());
