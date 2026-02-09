@@ -343,7 +343,20 @@ td small{color:var(--muted)}
   .modal-admin{width:calc(100vw - 12px);max-width:none;height:calc(100vh - 12px)}
   .modal-admin .modal-body{grid-template-columns:1fr !important;max-height:none;overflow:auto}
   .modal-admin .modal-head{position:sticky;top:0;background:var(--card);z-index:3}
-  .modal-foot-admin{position:sticky;bottom:0;background:var(--card);z-index:3;border-top:1px solid var(--border)}
+  /* Keep action buttons always visible above mobile browser bars */
+  .modal-foot-admin{
+    position:sticky;
+    bottom: max(0px, env(safe-area-inset-bottom));
+    background:var(--card);
+    z-index:3;
+    border-top:1px solid var(--border);
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .modal-foot-admin .btn{min-height:46px}
+  .modal-foot-admin #saveBtn{flex:1;min-width:160px}
 }
 .toast{
   position:fixed;left:16px;bottom:16px;
