@@ -561,19 +561,47 @@ function renderFeatured(){
 
 function hookHomeSearch(){
   const el = document.getElementById("qHome");
-  if(!el) return;
-  el.addEventListener("input", ()=>{
-    // When user searches, jump to "Todos los productos" view
-    const q = el.value || "";
-    STATE.activeCat = "Todas";
-    STATE.activeSubcat = "Todas";
-    showCategoryView();
-    const qCat = document.getElementById("q");
-    if(qCat){
-      qCat.value = q;
-      STATE.q = q;
+  const clearBtn = document.getElementById("clearHome");
+  let t = null;
+
+  const clearAll = ()=>{
+    if(el) el.value = "";
+    const q2 = document.getElementById("q");
+    if(q2) q2.value = "";
+    STATE.q = "";
+  };
+
+  if(clearBtn){
+    clearBtn.addEventListener("click", ()=>{
+      clearAll();
+      showHome();
       applyFilters();
-    }
+      toast("Búsqueda limpia");
+    });
+  }
+
+  if(!el) return;
+
+  el.addEventListener("input", ()=>{
+    clearTimeout(t);
+    t = setTimeout(()=>{
+      const q = (el.value || "").trim();
+      if(q.length === 0){
+        clearAll();
+        showHome();
+        return;
+      }
+      if(q.length < 2) return; // evita saltos por 1 letra
+      STATE.activeCat = "Todas";
+      STATE.activeSubcat = "Todas";
+      showCategoryView();
+      const qCat = document.getElementById("q");
+      if(qCat){
+        qCat.value = q;
+        STATE.q = q;
+        applyFilters();
+      }
+    }, 180);
   });
 }
 
@@ -585,7 +613,27 @@ function renderGrid(){
 
   if(!STATE.filtered.length){
     grid.innerHTML = "";
-    if(empty) empty.style.display = "block";
+    if(empty){
+      empty.style.display = "block";
+      const q = (STATE.q||"").trim();
+      const cat = STATE.activeCat && STATE.activeCat!=="Todas" ? STATE.activeCat : "";
+      const sub = STATE.activeSubcat && STATE.activeSubcat!=="Todas" ? STATE.activeSubcat : "";
+      const parts = [cat, sub].filter(Boolean).join(" • ");
+      const hint = q ? `con <strong>${escapeHtml(q)}</strong>` : (parts ? `en <strong>${escapeHtml(parts)}</strong>` : "");
+      const btn = q ? `<button class="btn" id="clearSearchBtn" type="button" style="margin-left:8px">Quitar búsqueda</button>` : "";
+      empty.innerHTML = `No hay productos para mostrar ${hint}. ${btn}`;
+      setTimeout(()=>{
+        const b = document.getElementById("clearSearchBtn");
+        if(b) b.addEventListener("click", ()=>{
+          STATE.q = "";
+          const qEl = document.getElementById("q");
+          if(qEl) qEl.value = "";
+          const qHome = document.getElementById("qHome");
+          if(qHome) qHome.value = "";
+          applyFilters();
+        });
+      }, 0);
+    }
     return;
   }
   if(empty) empty.style.display = "none";
@@ -760,6 +808,8 @@ async function bootStore(){
   $("#sort")?.addEventListener("change", (e)=>{ STATE.sort = e.target.value; applyFilters(); });
 
   $("#cfgBtn")?.addEventListener("click", ()=> openConfigDialog());
+  document.getElementById("cfgBtnTop")?.addEventListener("click", ()=> openConfigDialog());
+  document.getElementById("catsBtn")?.addEventListener("click", ()=>{ document.getElementById("homeCats")?.scrollIntoView({behavior:"smooth"}); });
   $("#cfgSave")?.addEventListener("click", ()=> saveConfigFromDialog());
   $("#cfgClose")?.addEventListener("click", ()=> closeConfigDialog());
   $("#cfgBackdrop")?.addEventListener("click", (e)=>{ if(e.target.id==="cfgBackdrop") closeConfigDialog(); });
