@@ -107,17 +107,13 @@ async function apiPost(action, payload){
 }
 
 /* ===== Theme ===== */
+/* Pedido: SOLO modo claro (sin noche). */
 function applyTheme(){
-  const t = getLS("SDCO_THEME","light");
-  document.documentElement.setAttribute("data-theme", t);
-  $("#themeBtn")?.setAttribute("aria-pressed", t==="dark" ? "true":"false");
+  try{ localStorage.setItem("SDCO_THEME","light"); }catch{}
+  document.documentElement.removeAttribute("data-theme"); // usa :root (claro)
 }
-function toggleTheme(){
-  const cur = getLS("SDCO_THEME","light");
-  const next = cur==="dark" ? "light":"dark";
-  setLS("SDCO_THEME", next);
-  applyTheme();
-}
+// toggleTheme se deja por compatibilidad, pero fuerza claro.
+function toggleTheme(){ applyTheme(); }
 
 /* ===== Storefront ===== */
 let STATE = {
@@ -759,13 +755,14 @@ async function bootStore(){
   applyTheme();
   const cfg = getConfig();
 
-  $("#brandName").textContent = cfg.APP_NAME;
-  $("#brandSub").textContent = "Pedidos por WhatsApp • " + (cfg.WHATSAPP_DISPLAY || cfg.WHATSAPP_NUMBER);
-  $("#waTop").href = "https://wa.me/" + cfg.WHATSAPP_NUMBER;
+  const bn = document.getElementById("brandName");
+  if(bn) bn.textContent = cfg.APP_NAME;
+  const bs = document.getElementById("brandSub");
+  if(bs) bs.textContent = "Pedidos por WhatsApp • " + (cfg.WHATSAPP_DISPLAY || cfg.WHATSAPP_NUMBER);
+  const waTop = document.getElementById("waTop");
+  if(waTop) waTop.href = "https://wa.me/" + cfg.WHATSAPP_NUMBER;
   const fab = document.getElementById("waFab");
   if(fab) fab.href = "https://wa.me/" + cfg.WHATSAPP_NUMBER;
-
-  $("#themeBtn")?.addEventListener("click", toggleTheme);
   $("#adminBtn")?.addEventListener("click", ()=> location.href = "admin.html");
   $("#closeModal")?.addEventListener("click", closeModal);
   $("#backdrop")?.addEventListener("click", (e)=>{ if(e.target.id==="backdrop") closeModal(); });
@@ -898,19 +895,17 @@ function saveConfigFromDialog(){
   toast("Configuración guardada");
   closeConfigDialog();
   // refresh brand without reload
-  $("#brandName").textContent = next.APP_NAME;
-  $("#brandSub").textContent = "Pedidos por WhatsApp • " + (next.WHATSAPP_DISPLAY || ("+" + (next.WHATSAPP_NUMBER||"")));
-  $("#waTop").href = "https://wa.me/" + next.WHATSAPP_NUMBER;
+  (()=>{const el=document.getElementById("brandName"); if(el) el.textContent = next.APP_NAME;})();
+  (()=>{const el=document.getElementById("brandSub"); if(el) el.textContent = "Pedidos por WhatsApp • " + (next.WHATSAPP_DISPLAY || ("+" + (next.WHATSAPP_NUMBER||"")));})();
+  (()=>{const el=document.getElementById("waTop"); if(el) el.href = "https://wa.me/" + next.WHATSAPP_NUMBER;})();
 }
 
 /* ===== Admin (se carga en admin.html) ===== */
 async function bootAdmin(){
   applyTheme();
   const cfg = getConfig();
-  $("#brandName").textContent = cfg.APP_NAME;
-  $("#brandSub").textContent = "Panel administrador";
-
-  $("#themeBtn")?.addEventListener("click", toggleTheme);
+  (()=>{const el=document.getElementById("brandName"); if(el) el.textContent = cfg.APP_NAME;})();
+  (()=>{const el=document.getElementById("brandSub"); if(el) el.textContent = "Panel administrador";})();
   $("#storeBtn")?.addEventListener("click", ()=> location.href="index.html");
   $("#logoutBtn")?.addEventListener("click", ()=>{ localStorage.removeItem("SDCO_ADMIN_KEY"); toast("Sesión cerrada"); location.reload(); });
 
