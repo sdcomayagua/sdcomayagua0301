@@ -28,12 +28,12 @@ function setLS(key, value){
 }
 
 function getConfig(){
-  const stored = getLS("SDCO_CONFIG", null);
+  const stored = getLS("SDCO_CONFIG_V2", null);
   return Object.assign({}, window.SDCO_DEFAULTS || {}, stored || {});
 }
 function setConfig(patch){
   const next = Object.assign({}, getConfig(), patch);
-  setLS("SDCO_CONFIG", next);
+  setLS("SDCO_CONFIG_V2", next);
   return next;
 }
 
@@ -117,6 +117,13 @@ function toggleTheme(){
   const next = cur==="dark" ? "light":"dark";
   setLS("SDCO_THEME", next);
   applyTheme();
+}
+
+
+/* ===== View helpers ===== */
+function setView(name){
+  document.body.classList.remove("view-home","view-cat");
+  document.body.classList.add(name==="cat" ? "view-cat" : "view-home");
 }
 
 /* ===== Storefront ===== */
@@ -226,6 +233,7 @@ function updateBreadcrumb(){
 }
 
 function showCategoryView(){
+  setView('cat');
   $("#homeCats").style.display = "none";
   $("#catView").style.display = "block";
   $("#catTitle").textContent = STATE.activeCat === "Todas" ? "Todos los productos" : STATE.activeCat;
@@ -737,7 +745,7 @@ function closeModal(){
 }
 
 /* ===== Boot storefront ===== */
-async function bootStore(){
+async async function bootStore(){
   applyTheme();
   const cfg = getConfig();
 
@@ -1231,4 +1239,14 @@ window.addEventListener("DOMContentLoaded", ()=>{
   const page = document.body.getAttribute("data-page");
   if(page==="admin") bootAdmin();
   else bootStore();
+});
+
+function showHomeView(){ setView('home'); }
+
+document.addEventListener("DOMContentLoaded", ()=>{ setView('home'); applyTheme(); });
+
+// v7 bindings
+document.getElementById("catsBtn")?.addEventListener("click", ()=>{
+  showHomeView();
+  document.getElementById("homeCats")?.scrollIntoView({behavior:"smooth"});
 });
