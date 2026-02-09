@@ -758,3 +758,73 @@ html[data-theme="dark"] body{background:var(--bg) !important}
 
 /* Dark mode hardening */
 html[data-theme="dark"] body{background:var(--bg) !important;color:var(--text) !important}
+
+
+/* --- Home mini sections (Destacados/Ofertas/Nuevos) --- */
+#featuredGrid,#ofertasGrid,#nuevosGrid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;
+}
+@media (max-width: 720px){
+  #featuredGrid,#ofertasGrid,#nuevosGrid{ gap:10px; }
+}
+@media (max-width: 420px){
+  #featuredGrid,#ofertasGrid,#nuevosGrid{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+.mini-card{
+  border:1px solid rgba(0,0,0,.08);
+  border-radius:16px;
+  overflow:hidden;
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  cursor:pointer;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.mini-card:hover{ transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.mini-img{
+  width:100%;
+  aspect-ratio: 4/3;
+  background-size: cover;
+  background-position:center;
+  background-color: rgba(0,0,0,.04);
+}
+.mini-body{ padding:10px 10px 12px; display:flex; flex-direction:column; gap:8px; }
+.mini-title{ font-weight:800; font-size:14px; line-height:1.2; min-height:34px; }
+.mini-meta{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.mini-meta .price{ font-weight:900; }
+.mini-btn{
+  border:0;
+  border-radius:12px;
+  padding:10px 10px;
+  font-weight:800;
+  background: rgba(0,129,255,.12);
+  color: var(--text);
+}
+[data-theme="dark"] .mini-btn{ background: rgba(0,129,255,.18); }
+
+/* --- Header layout tweaks --- */
+@media (min-width: 900px){
+  .head8{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding-top:14px;
+    padding-bottom:14px;
+  }
+  .h8-search{ margin-top:0; flex:1; }
+  .h8-top{ flex:0 0 auto; }
+  .h8-actions{ flex:0 0 auto; }
+}
+@media (max-width: 520px){
+  .h8-top{
+    display:grid;
+    grid-template-columns: 54px 1fr 54px 54px;
+    align-items:center;
+    gap:10px;
+  }
+  .brand-cta{ justify-self:center; }
+  .brand-logo{ justify-self:center; }
+  .h8-actions{ display:flex; justify-content:flex-end; gap:10px; }
+  .h8-search .search{ height:54px; }
+}
