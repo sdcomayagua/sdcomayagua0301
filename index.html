@@ -40,7 +40,7 @@
 
     <div class="hrow hrow3">
       <button class="btn" id="catsBtn" type="button"><span class="btn-ico" aria-hidden="true">☰</span> Categorías</button>
-      <button class="btn icon" id="cfgBtnTop" type="button" title="Configuración" aria-label="Configuración">⚙️</button>
+      <button class="btn" id="adminBtn" type="button" title="Admin" aria-label="Admin"><span class="btn-ico" aria-hidden="true">🔒</span> Admin</button>
     </div>
   </div>
 </header>
@@ -55,7 +55,6 @@
           <div class="cta">
             <button class="btn primary" id="goCats" type="button">Ver categorías</button>
             <button class="btn" id="goAll" type="button">Ver todo</button>
-            <button class="btn" id="cfgBtn" type="button">Config</button>
             <span class="btn" id="loading" style="display:none;pointer-events:none;">Cargando…</span>
           </div>
         </div>
@@ -103,7 +102,7 @@
         <a href="#" id="seeAllLink2">Ver todo</a>
       </div>
       <div class="sb">
-        <div class="rowcards" id="featuredGrid"></div>
+        <div class="hscroll" id="featuredGrid"></div>
       </div>
     </section>
 
