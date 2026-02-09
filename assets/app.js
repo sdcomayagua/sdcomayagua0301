@@ -28,12 +28,12 @@ function setLS(key, value){
 }
 
 function getConfig(){
-  const stored = getLS("SDCO_CONFIG_V2", null);
+  const stored = getLS("SDCO_CONFIG", null);
   return Object.assign({}, window.SDCO_DEFAULTS || {}, stored || {});
 }
 function setConfig(patch){
   const next = Object.assign({}, getConfig(), patch);
-  setLS("SDCO_CONFIG_V2", next);
+  setLS("SDCO_CONFIG", next);
   return next;
 }
 
@@ -117,13 +117,6 @@ function toggleTheme(){
   const next = cur==="dark" ? "light":"dark";
   setLS("SDCO_THEME", next);
   applyTheme();
-}
-
-
-/* ===== View helpers ===== */
-function setView(name){
-  document.body.classList.remove("view-home","view-cat");
-  document.body.classList.add(name==="cat" ? "view-cat" : "view-home");
 }
 
 /* ===== Storefront ===== */
@@ -233,7 +226,6 @@ function updateBreadcrumb(){
 }
 
 function showCategoryView(){
-  setView('cat');
   $("#homeCats").style.display = "none";
   $("#catView").style.display = "block";
   $("#catTitle").textContent = STATE.activeCat === "Todas" ? "Todos los productos" : STATE.activeCat;
@@ -493,21 +485,39 @@ function pickFeatured(max=8){
 }
 
 function renderFeatured(){
-  const grid = document.getElementById("featGrid");
-  if(!grid) return;
+  const sec = document.getElementById("featuredSec");
+  const grid = document.getElementById("featuredGrid");
+  if(!sec || !grid) return;
 
-  const items = pickFeatured().slice(0, 3); // ✅ solo 3 para que no se haga larguísimo
-  grid.classList.add("compact-grid");
+  const items = pickFeatured(8);
+  if(!items.length){
+    sec.style.display = "none";
+    return;
+  }
+  sec.style.display = "block";
 
   const cfg = getConfig();
   grid.innerHTML = items.map(p=>{
     const priceText = (p.precio==="" || p.precio===null || p.precio===undefined) ? "Consultar" : fmtMoney(p.precio, cfg.CURRENCY, cfg.LOCALE);
     const img = p.img || (p.gallery[0]||"");
+    const tags = [];
+    if(String(p.nombre||"").toLowerCase().includes("oferta")) tags.push("off");
+    if(String(p.nombre||"").toLowerCase().includes("nuevo")) tags.push("new");
+    if(p.stock>0 && p.stock<=2) tags.push("hot");
+    const tagHtml = tags.length ? `<div class="badges">${tags.map(t=>{
+      const label = t==="off"?"OFERTA":t==="new"?"NUEVO":"HOT";
+      return `<span class="tag ${t}">${label}</span>`;
+    }).join("")}</div>` : "";
+
     return `
-      <article class="card compact" data-id="${escapeHtml(p.id)}">
-        <div class="img">${img ? `<img src="${escapeHtml(img)}" alt="${escapeHtml(p.nombre)}">` : `<span class="pill">Sin imagen</span>`}</div>
+      <article class="card" data-id="${escapeHtml(p.id)}">
+        <div class="img">${tagHtml}${img ? `<img src="${escapeHtml(img)}" alt="${escapeHtml(p.nombre)}">` : `<span class="pill">Sin imagen</span>`}</div>
         <div class="body">
           <div class="title">${escapeHtml(p.nombre)}</div>
+          <div class="meta">
+            <span class="badge ${p.stock>0 ? "ok":"bad"}">${p.stock>0 ? "Disponible" : "Agotado"}</span>
+            <span class="badge">${escapeHtml(p.categoria)}</span>
+          </div>
           <div class="price">
             <strong>${escapeHtml(priceText)}</strong>
             <button class="smallbtn" data-share="1" title="Compartir">Compartir</button>
@@ -517,7 +527,7 @@ function renderFeatured(){
     `;
   }).join("");
 
-  // Clicks
+  // bind same behavior as main grid
   $$(".card", grid).forEach(card=>{
     card.addEventListener("click", (e)=>{
       if(e.target?.dataset?.share) return;
@@ -539,7 +549,7 @@ function renderFeatured(){
       const url = buildProductUrl(p);
       try{
         if(navigator.share){
-          await navigator.share({ title:p.nombre, text:p.nombre, url });
+          await navigator.share({ title:p.nombre, text: p.nombre, url });
         }else{
           await navigator.clipboard.writeText(url);
           toast("Link copiado");
@@ -745,7 +755,7 @@ function closeModal(){
 }
 
 /* ===== Boot storefront ===== */
-async async function bootStore(){
+async function bootStore(){
   applyTheme();
   const cfg = getConfig();
 
@@ -1239,14 +1249,4 @@ window.addEventListener("DOMContentLoaded", ()=>{
   const page = document.body.getAttribute("data-page");
   if(page==="admin") bootAdmin();
   else bootStore();
-});
-
-function showHomeView(){ setView('home'); }
-
-document.addEventListener("DOMContentLoaded", ()=>{ setView('home'); applyTheme(); });
-
-// v7 bindings
-document.getElementById("catsBtn")?.addEventListener("click", ()=>{
-  showHomeView();
-  document.getElementById("homeCats")?.scrollIntoView({behavior:"smooth"});
 });
