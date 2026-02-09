@@ -38,7 +38,8 @@ a{color:inherit}
 .container{max-width:1180px;margin:0 auto;padding:16px}
 .topbar{
   position:sticky;top:0;z-index:50;
-  background:color-mix(in srgb, var(--bg) 88%, transparent);
+  /* Más claro y tipo “barra” */
+  background: color-mix(in srgb, var(--card) 70%, white);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border);
 }
@@ -652,14 +653,27 @@ td small{color:var(--muted)}
 .hrow1{ justify-content:flex-start; }
 .hbrand{ gap:0; }
 .hlogo-wide{
-  width: min(280px, 68vw);
-  height: 52px;
+  /* Logo más grande, estilo barra */
+  width: min(380px, 92vw);
+  height: 70px;
   object-fit: contain;
   padding: 0;
   background: transparent;
   border: 0;
   border-radius: 12px;
   box-shadow: none;
+}
+
+/* Buscador debajo del logo: más limpio */
+.hrow2{
+  box-shadow: 0 10px 24px rgba(2,6,23,.08);
+}
+.hsearch{ font-size: 15px; }
+
+@media (max-width: 420px){
+  .container{padding:12px}
+  .hlogo-wide{ height: 64px; }
+  .hrow3 .btn{ padding: 10px 12px; }
 }
 
 /* Botoncitos del header más premium */
