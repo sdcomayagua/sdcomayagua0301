@@ -26,23 +26,27 @@
   </noscript>
 
   <header class="topbar">
-  <div class="container topbar-inner head8">
-    <div class="h8-row h8-top">
-      <button class="btn icon" id="catsBtn" type="button" title="Menú" aria-label="Menú">☰</button>
-
-      <a class="h8-brand" href="#top" aria-label="Inicio">
-        <img class="hlogo" src="assets/logo.png" alt="SD-Comayagua">
+  <div class="container topbar-inner head3">
+    <div class="hrow hrow1">
+      <a class="hbrand" href="#top" aria-label="Inicio">
+        <img class="hlogo" src="assets/logo.png" alt="SDComayagua" width="48" height="48" style="width:48px;height:48px;max-width:48px;max-height:48px;object-fit:contain;">
+        <div class="htxt">
+          <div class="hname" id="brandName">Soluciones Digitales Comayagua</div>
+          <div class="hsub" id="brandSub">Tienda online • Comayagua</div>
+        </div>
       </a>
-
-      <div class="h8-actions">
-        <button class="btn icon" id="cfgBtnTop" type="button" title="Config" aria-label="Config">⚙</button>
-        <button class="btn icon" id="themeBtn" type="button" title="Modo" aria-label="Modo">☾</button>
-      </div>
+      <a class="btn primary hwa" id="waTop" href="#" target="_blank" rel="noopener">WhatsApp</a>
     </div>
 
-    <div class="h8-row h8-search" role="search" aria-label="Buscar productos">
-      <input class="input hsearch" id="qHome" placeholder="Buscar productos..." />
+    <div class="hrow hrow2" role="search" aria-label="Buscar productos">
+      <input class="input hsearch" id="qHome" placeholder="Buscar productos (ej: audífonos, cargador, USB)..." >
       <button class="btn icon hclear" id="clearHome" type="button" title="Limpiar" aria-label="Limpiar">✕</button>
+    </div>
+
+    <div class="hrow hrow3">
+      <button class="btn" id="catsBtn" type="button">Categorías</button>
+      <button class="btn" id="cfgBtnTop" type="button">Config</button>
+      <button class="btn icon" id="themeBtn" type="button" title="Modo claro/oscuro" aria-label="Tema">☾</button>
     </div>
   </div>
 </header>
