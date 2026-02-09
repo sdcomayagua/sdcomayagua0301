@@ -119,6 +119,13 @@ function toggleTheme(){
   applyTheme();
 }
 
+
+/* ===== View helpers ===== */
+function setView(name){
+  document.body.classList.remove("view-home","view-cat");
+  document.body.classList.add(name==="cat" ? "view-cat" : "view-home");
+}
+
 /* ===== Storefront ===== */
 let STATE = {
   productos: [],
@@ -226,6 +233,7 @@ function updateBreadcrumb(){
 }
 
 function showCategoryView(){
+  setView('cat');
   $("#homeCats").style.display = "none";
   $("#catView").style.display = "block";
   $("#catTitle").textContent = STATE.activeCat === "Todas" ? "Todos los productos" : STATE.activeCat;
@@ -1231,4 +1239,14 @@ window.addEventListener("DOMContentLoaded", ()=>{
   const page = document.body.getAttribute("data-page");
   if(page==="admin") bootAdmin();
   else bootStore();
+});
+
+function showHomeView(){ setView('home'); }
+
+document.addEventListener("DOMContentLoaded", ()=>{ setView('home'); applyTheme(); });
+
+// v7 bindings
+document.getElementById("catsBtn")?.addEventListener("click", ()=>{
+  showHomeView();
+  document.getElementById("homeCats")?.scrollIntoView({behavior:"smooth"});
 });

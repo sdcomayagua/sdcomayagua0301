@@ -687,3 +687,42 @@ td small{color:var(--muted)}
 .card.compact .price strong{font-size:14px}
 
 /* Hide big long list feel on home sections cards (Ofertas/Nuevos) are already in hscroll, keep as is. */
+
+
+/* ===== v6: long logo sizing ===== */
+.topbar .hlogo{max-width:240px !important; width:100% !important; height:auto !important}
+@media (max-width: 520px){
+  .topbar .hlogo{max-width:200px !important;}
+}
+
+
+/* ===== v7: Header móvil 2 filas (sin WhatsApp arriba) ===== */
+.head7{display:flex;flex-direction:column;gap:10px;padding:10px 0}
+.h7-row{display:flex;align-items:center;gap:10px}
+.h7-top{justify-content:space-between}
+.h7-brand{display:flex;align-items:center;min-width:0}
+.h7-icons{display:flex;align-items:center;gap:10px}
+.h7-icons .btn.icon{width:44px;height:44px;border-radius:14px}
+.h7-search{
+  border:1px solid var(--border);
+  background: color-mix(in srgb, var(--card) 92%, transparent);
+  border-radius: 16px;
+  padding:8px;
+}
+.h7-search .hsearch{border:0;background:transparent;flex:1;padding:10px 10px}
+.h7-search .hclear{width:42px;height:42px;border-radius:12px}
+
+/* Evitar que se vean "Categorías" repetidas: ocultamos vista de categoría al cargar */
+#catView{display:none}
+body.view-cat #catView{display:block}
+body.view-cat #homeView{display:none}
+body.view-home #catView{display:none}
+body.view-home #homeView{display:block}
+
+/* Ajuste: logo no tan grande en móvil */
+@media (max-width: 520px){
+  .topbar .hlogo{max-width:170px !important}
+}
+
+/* Dark mode: asegurar que el fondo cambie */
+html[data-theme="dark"] body{background:var(--bg) !important}
