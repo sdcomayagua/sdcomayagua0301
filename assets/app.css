@@ -585,3 +585,60 @@ td small{color:var(--muted)}
   .headactions #cfgBtnTop{display:none;}
   #waTop{padding:10px 12px}
 }
+
+
+/* ===== Header Pro v3 (Diunsa-like, mobile-first) ===== */
+.head3{display:flex;flex-direction:column;gap:10px;padding-top:10px;padding-bottom:10px}
+.hrow{display:flex;align-items:center;gap:10px}
+.hrow1{justify-content:space-between;gap:12px}
+.hbrand{display:flex;align-items:center;gap:10px;min-width:0;text-decoration:none}
+.hlogo{
+  width:54px;height:54px;object-fit:contain;
+  border-radius:14px;
+  background: color-mix(in srgb, var(--card) 92%, transparent);
+  border:1px solid var(--border);
+  padding:6px;
+}
+.htxt{min-width:0}
+.hname{
+  font-weight:950;
+  letter-spacing:-.3px;
+  font-size:14px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  color: var(--text);
+}
+.hsub{
+  margin-top:2px;
+  font-size:12px;
+  color:var(--muted);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.hwa{padding:11px 12px; font-weight:950; border-radius:14px}
+.hrow2{
+  border:1px solid var(--border);
+  background: color-mix(in srgb, var(--card) 92%, transparent);
+  border-radius: 16px;
+  padding:8px;
+}
+.hsearch{
+  border:0;background:transparent;
+  padding:10px 10px;
+  flex:1;
+}
+.hclear{width:42px;height:42px;border-radius:12px}
+.hrow3{gap:10px;flex-wrap:wrap}
+.hrow3 .btn{border-radius:14px;font-weight:900}
+.hrow3 .btn.icon{width:44px;height:44px}
+
+@media (min-width: 920px){
+  .head3{flex-direction:row;align-items:center;justify-content:space-between;gap:14px}
+  .hrow1{flex: 0 0 auto}
+  .hrow2{flex: 1 1 520px; max-width: 620px}
+  .hrow3{flex: 0 0 auto}
+  .hlogo{width:48px;height:48px}
+  .hname{font-size:15px}
+}
