@@ -63,9 +63,8 @@ textarea{resize:vertical}
   position: sticky;
   top:0;
   z-index:50;
-  background: color-mix(in oklab, var(--panel) 92%, transparent);
+  background: var(--panel);
   border-bottom:1px solid var(--border);
-  backdrop-filter: blur(10px);
 }
 .topbar-inner{
   display:flex;
@@ -81,8 +80,9 @@ textarea{resize:vertical}
   gap:12px;
   min-width: 140px;
 }
+.brand-center{ justify-content:flex-start; width:auto; }
 .brand img{
-  height: clamp(38px, 4vw, 52px);
+  height: clamp(44px, 6.2vw, 64px);
   width:auto;
   object-fit:contain;
   filter: drop-shadow(0 6px 12px rgba(2,6,23,.18));
@@ -100,6 +100,7 @@ textarea{resize:vertical}
   flex:1;
   justify-content:flex-end;
 }
+.header-stack{ width:100%; justify-content:center; }
 .headbtns{
   display:flex;
   gap:10px;
@@ -107,6 +108,11 @@ textarea{resize:vertical}
   flex-wrap:wrap;
   justify-content:flex-end;
 }
+.headbtns-wide{ width:100%; justify-content:center; }
+.navbtn{ padding: 14px 18px; border-radius: 999px; font-weight:900; }
+.iconpill{ width:52px; height:52px; border-radius: 999px; display:inline-flex; align-items:center; justify-content:center; }
+.topbar-stack{ flex-wrap:wrap; }
+.search-wide{ width:100%; max-width: 760px; }
 .searchbar{
   position:relative;
   flex: 1;
@@ -181,13 +187,13 @@ textarea{resize:vertical}
 .hero{
   margin-top: 14px;
   border-radius: var(--radius2);
-  background: linear-gradient(135deg,
-    color-mix(in oklab, var(--brand) 88%, #0b1220),
-    color-mix(in oklab, var(--brand2) 70%, #0b1220)
-  );
-  color: #ffffff;
+  background:
+    radial-gradient(900px 260px at 18% 18%, color-mix(in oklab, var(--brand) 18%, transparent), transparent 60%),
+    linear-gradient(135deg, color-mix(in oklab, var(--panel) 92%, var(--brand) 8%), var(--panel));
+  color: var(--text);
   overflow:hidden;
   box-shadow: var(--shadow);
+  border: 1px solid var(--border);
 }
 .hero-inner{
   padding: 22px 18px;
@@ -203,7 +209,7 @@ textarea{resize:vertical}
 }
 .hero p{
   margin:0;
-  opacity:.95;
+  opacity:.9;
   max-width: 58ch;
 }
 .cta{
@@ -219,17 +225,17 @@ textarea{resize:vertical}
   margin-top: 12px;
 }
 .chip{
-  border:1px solid rgba(255,255,255,.22);
-  background: rgba(255,255,255,.14);
-  color:#fff;
+  border:1px solid var(--border);
+  background: color-mix(in oklab, var(--panel2) 80%, transparent);
+  color: var(--text);
   padding: 7px 10px;
   border-radius: 999px;
   font-weight:800;
   cursor:pointer;
   user-select:none;
 }
-.chip:hover{background: rgba(255,255,255,.20)}
-.chip.active{background: rgba(255,255,255,.26)}
+.chip:hover{background: color-mix(in oklab, var(--panel) 70%, var(--brand) 30%)}
+.chip.active{background: color-mix(in oklab, var(--panel) 58%, var(--brand) 42%)}
 
 /* Section */
 .section{margin-top:18px}
@@ -330,8 +336,8 @@ select.input{cursor:pointer}
   cursor:pointer;
 }
 .card-media img{
-  display:block;
   width:100%;
+  display:block;
   aspect-ratio: 4/3;
   object-fit: cover;
   background: color-mix(in oklab, var(--panel) 85%, transparent);
@@ -348,23 +354,6 @@ select.input{cursor:pointer}
   letter-spacing: .2px;
   backdrop-filter: blur(6px);
 }
-
-.card-media{
-  border-radius: calc(var(--radius) - 2px);
-  overflow:hidden;
-}
-.card-media::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background: linear-gradient(120deg, rgba(2,132,199,.08), rgba(14,165,233,.12), rgba(2,132,199,.08));
-  opacity:.9;
-}
-.card-media img{
-  position:relative;
-  z-index:1;
-}
-
 .badge.offer{
   background: linear-gradient(180deg, #fb7185, #ef4444);
 }
@@ -694,20 +683,6 @@ select.input{cursor:pointer}
 ul{padding-left: 18px; margin: 10px 0}
 
 /* Responsive */
-
-@media (max-width: 720px){
-  .topbar-inner{flex-wrap:wrap; align-items:center}
-  .brand img{max-width:150px; height:auto}
-  .header-actions{width:100%; justify-content:space-between; gap:10px}
-  .searchbar{flex:1; min-width: 180px}
-  .btn.iconbtn{width:44px; justify-content:center; padding:10px}
-}
-@media (max-width: 460px){
-  .brand img{max-width:130px}
-  .header-actions{gap:8px}
-  .searchbar input{padding-right:34px}
-}
-
 @media (max-width: 920px){
   .mgrid{grid-template-columns: 1fr}
   .adminLayout{grid-template-columns:1fr}
@@ -725,4 +700,38 @@ ul{padding-left: 18px; margin: 10px 0}
   .searchbar{max-width:none}
   .btn{padding: 10px 12px}
   :root{--topbarH: 68px}
+}
+
+
+/* --- Image fallback polish --- */
+img.img-fallback{
+  object-fit: cover;
+  filter: saturate(1.05);
+}
+.card-media{
+  overflow:hidden;
+  border-radius: 18px 18px 0 0;
+}
+.mmain img{
+  display:block;
+}
+.mthumbs img{
+  display:block;
+}
+
+/* --- Better mobile header layout --- */
+@media (max-width: 520px){
+  .topbar-inner{ flex-direction: column; align-items: center; gap: 12px; padding: 12px 0 14px; }
+  .brand{ justify-content:center; width:100%; }
+  .brand img{ height: 58px; }
+  .header-actions{ width: 100%; justify-content:center; flex-direction: column; align-items: center; }
+  .searchbar{ width: 100%; max-width: 680px; }
+  .headbtns{ width: 100%; justify-content:center; }
+  .navbtn{ flex: 1 1 0; min-width: 0; max-width: 250px; }
+  .iconpill{ width: 52px; height: 52px; }
+}
+
+/* --- Product card media keeps nice height even if image missing --- */
+.card-media img{
+  background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 35%, #fff), color-mix(in oklab, var(--brand2) 35%, #fff));
 }

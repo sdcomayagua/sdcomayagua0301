@@ -1,44 +1,29 @@
 /* SDComayagua – Frontend PRO (Tienda + Admin) */
 const $ = (s, el=document) => el.querySelector(s);
 const $$ = (s, el=document) => Array.from(el.querySelectorAll(s));
-// Imagen placeholder (evita icono de imagen rota)
-const SDCO_PLACEHOLDER = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900">
-  <defs>
-    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
-      <stop offset="0" stop-color="#0ea5e9" stop-opacity="0.18"/>
-      <stop offset="1" stop-color="#0284c7" stop-opacity="0.28"/>
-    </linearGradient>
-  </defs>
-  <rect width="1200" height="900" fill="url(#g)"/>
-  <rect x="70" y="70" width="1060" height="760" rx="44" fill="rgba(255,255,255,0.55)"/>
-  <g fill="rgba(2,132,199,0.35)">
-    <path d="M330 620l140-150 120 120 160-180 210 210H330z"/>
-    <circle cx="460" cy="380" r="46"/>
-  </g>
-  <text x="600" y="720" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="42" fill="rgba(15,23,42,0.55)">
-    SDComayagua
-  </text>
-</svg>`);
 
-function safeImgSrc(src){
-  const s = String(src||'').trim();
-  if(!s) return SDCO_PLACEHOLDER;
-  // evita valores raros tipo "{p.nombre}"
-  if(s.includes('{') || s.includes('}')) return SDCO_PLACEHOLDER;
-  return s;
+/* ---------------- Image fallback ---------------- */
+const IMG_FALLBACK = "assets/placeholder.svg";
+function isProbablyUrl(u){
+  if(!u) return false;
+  const s = String(u).trim();
+  if(!s) return false;
+  // allow http(s) and data and relative paths
+  return /^https?:\/\//i.test(s) || /^data:image\//i.test(s) || s.startsWith("assets/") || s.startsWith("./") || s.startsWith("../") || s.startsWith("/");
 }
-
-function attachImgFallback(scope=document){
-  scope.querySelectorAll('img').forEach(img=>{
-    img.addEventListener('error', ()=>{
-      if(img.dataset._fallbackDone) return;
-      img.dataset._fallbackDone = '1';
-      img.src = SDCO_PLACEHOLDER;
-    }, { once:false });
+function applyImgFallback(rootEl=document){
+  const imgs = rootEl.querySelectorAll("img[data-fallback]");
+  imgs.forEach(img=>{
+    if(img.dataset.bound) return;
+    img.dataset.bound = "1";
+    img.addEventListener("error", ()=>{
+      const fb = img.getAttribute("data-fallback") || IMG_FALLBACK;
+      if(img.src.includes(fb)) return;
+      img.src = fb;
+      img.classList.add("img-fallback");
+    });
   });
 }
-
 
 /* ---------------- Config + Theme ---------------- */
 function getConfig(){
@@ -157,7 +142,7 @@ function normalizeProd(p){
     stock: Number.isFinite(stock) ? stock : 0,
     activo: !!active,
     descripcion: String(p.descripcion || "").trim(),
-    imgs: uniqueImgs.length ? uniqueImgs : [SDCO_PLACEHOLDER],
+    imgs: uniqueImgs.length ? uniqueImgs : ["https://via.placeholder.com/800x600?text=Producto"],
     video_url: String(p.video_url || "").trim(),
     ofertas_json: String(p.ofertas_json || "").trim(),
     // keep gallery fields for admin editing
@@ -384,20 +369,25 @@ function storeInit(){
     }
 
     // gallery
-    const imgs = p.imgs || [];
-    els.mMainImg.src = imgs[0];
+    const imgs = (p.imgs || []).filter(Boolean);
+    const first = imgs[0] && isProbablyUrl(imgs[0]) ? imgs[0] : IMG_FALLBACK;
+    els.mMainImg.src = first;
+    els.mMainImg.setAttribute("data-fallback", IMG_FALLBACK);
     els.mMainImg.alt = p.nombre;
 
     els.mThumbs.innerHTML = imgs.map((src, i)=>`
       <button class="thumb ${i===0?"active":""}" data-src="${encodeURIComponent(src)}" type="button" title="Ver imagen">
-        <img src="${safeImgSrc(src)}" alt="thumb">
+        <img src="${src}" data-fallback="${IMG_FALLBACK}" alt="thumb">
       </button>
     `).join("");
+
+    applyImgFallback(els.mThumbs);
+    applyImgFallback(els.backdrop);
 
     $$(".thumb", els.mThumbs).forEach(btn=>{
       btn.addEventListener("click", ()=>{
         const src = decodeURIComponent(btn.getAttribute("data-src"));
-        els.mMainImg.src = src;
+        els.mMainImg.src = isProbablyUrl(src) ? src : IMG_FALLBACK;
         $$(".thumb", els.mThumbs).forEach(b=>b.classList.remove("active"));
         btn.classList.add("active");
       });
@@ -529,7 +519,8 @@ function storeInit(){
 
     els.grid.innerHTML = items.map(p=>{
       const agotado = p.stock <= 0;
-      const img = safeImgSrc(p.imgs?.[0]);
+      const imgRaw = p.imgs?.[0] || "";
+      const img = isProbablyUrl(imgRaw) ? imgRaw : IMG_FALLBACK;
 
       const badges = [
         p.offer ? `<div class="badge offer">${escapeHtml(p.offer.badge)}</div>` : "",
@@ -547,7 +538,7 @@ function storeInit(){
       return `
         <article class="card" data-id="${encodeURIComponent(p.id)}">
           <button class="card-media" data-open="1" type="button" aria-label="Ver ${escapeHtml(p.nombre)}">
-            <img loading="lazy" src="${img}" alt="${escapeHtml(p.nombre)}">
+            <img loading="lazy" src="${img}" data-fallback="${IMG_FALLBACK}" alt="${escapeHtml(p.nombre)}">
             ${badges}
           </button>
 
@@ -570,7 +561,7 @@ function storeInit(){
       `;
     }).join("");
 
-    attachImgFallback(els.grid);
+    applyImgFallback(els.grid);
 
     // events
     $$(".card [data-open='1']", els.grid).forEach(btn=>{
@@ -803,14 +794,15 @@ function adminInit(){
     tableBody.innerHTML = items.map(p=>{
       const status = p.activo ? "Activo" : "Inactivo";
       const out = p.stock <= 0;
-      const img = p.imgs?.[0] || "https://via.placeholder.com/80?text=img";
+      const imgRaw = p.imgs?.[0] || "";
+      const img = isProbablyUrl(imgRaw) ? imgRaw : IMG_FALLBACK;
       const price = fmtMoney(p.precio_final);
 
       return `
         <tr data-id="${encodeURIComponent(p.id)}">
           <td>
             <div class="mini">
-              <img src="${img}" alt="">
+              <img src="${img}" data-fallback="${IMG_FALLBACK}" alt="">
               <div>
                 <div style="font-weight:950">${escapeHtml(p.nombre)}</div>
                 <div class="small">${escapeHtml(p.categoria)}${p.subcategoria? " • "+escapeHtml(p.subcategoria):""}</div>
@@ -830,6 +822,8 @@ function adminInit(){
         </tr>
       `;
     }).join("");
+
+    applyImgFallback(tableBody);
 
     $$("button[data-act]", tableBody).forEach(b=>{
       b.addEventListener("click", async ()=>{
