@@ -288,7 +288,23 @@ function storeInit(){
   function buildWA(p){
     const wa = getConfig().WHATSAPP_NUMBER || "50431517755";
     const priceText = fmtMoney(p.precio_final);
-    const msg = `Hola, quiero comprar: ${p.nombre} (${priceText}).`;
+    const url = new URL(location.href);
+    url.hash = `p=${encodeURIComponent(p.id)}`;
+    const stockText = (p.stock>0) ? String(p.stock) : "Agotado";
+    const catText = `${p.categoria}${p.subcategoria ? " / " + p.subcategoria : ""}`;
+    const msg =
+`¡Hola! 👋
+
+Quiero comprar este producto de SD-Comayagua:
+
+• Producto: ${p.nombre}
+• Precio: ${priceText}
+• Stock: ${stockText}
+• Categoría: ${catText}
+
+Link del producto: ${url.toString()}
+
+¿Me confirmás disponibilidad y el tiempo de entrega? Gracias 😊`;
     return `https://wa.me/${wa}?text=${encodeURIComponent(msg)}`;
   }
 
@@ -696,6 +712,7 @@ function adminInit(){
   const loginBtn = $("#loginBtn");
   const logoutBtn = $("#logoutBtn");
   const tableBody = $("#atable");
+  const cardsWrap = $("#acards");
   const meta = $("#adminMeta");
   const aSearch = $("#aSearch");
   const aFilter = $("#aFilter");
@@ -788,8 +805,64 @@ function adminInit(){
   }
 
   function renderTable(items){
-    if(!tableBody) return;
     if(meta) meta.textContent = `Mostrando ${items.length} de ${list.length}`;
+
+    // --- Móvil: tarjetas para evitar scroll horizontal ---
+    if(cardsWrap){
+      cardsWrap.innerHTML = items.map(p=>{
+        const status = p.activo ? "Activo" : "Inactivo";
+        const out = p.stock <= 0;
+        const imgRaw = p.imgs?.[0] || "";
+        const img = isProbablyUrl(imgRaw) ? imgRaw : IMG_FALLBACK;
+        const price = fmtMoney(p.precio_final);
+        const chipCls = p.activo ? "good" : "bad";
+        return `
+          <div class="acard" data-id="${encodeURIComponent(p.id)}">
+            <div class="thumb"><img src="${img}" data-fallback="${IMG_FALLBACK}" alt=""></div>
+            <div class="info">
+              <div class="name">${escapeHtml(p.nombre)}</div>
+              <div class="meta">${escapeHtml(p.categoria)}${p.subcategoria?" • "+escapeHtml(p.subcategoria):""}</div>
+              <div class="row">
+                <span class="chip">${price}</span>
+                ${(p.offer && p.precio_final!==p.precio_base)?`<span class="chip" style="text-decoration:line-through;opacity:.7">${fmtMoney(p.precio_base)}</span>`:""}
+                <span class="chip ${out?"bad":"good"}">${out?"Sin stock":"Stock: "+p.stock}</span>
+                <span class="chip ${chipCls}">${status}</span>
+              </div>
+              <div class="actions">
+                <button class="btn" data-act="edit" type="button">Editar</button>
+                <button class="btn" data-act="dup" type="button">Duplicar</button>
+                <button class="btn danger" data-act="deact" type="button">Desactivar</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+      applyImgFallback(cardsWrap);
+      $$('button[data-act]', cardsWrap).forEach(b=>{
+        b.addEventListener('click', async ()=>{
+          const wrap = b.closest('.acard');
+          const id = decodeURIComponent(wrap.getAttribute('data-id'));
+          const p = list.find(x=>x.id===id);
+          const act = b.getAttribute('data-act');
+          if(!p) return;
+
+          if(act === 'edit'){
+            openEditor(p, 'edit');
+          }else if(act === 'dup'){
+            const clone = deepClone(p);
+            clone.id = cryptoId();
+            clone.nombre = `${clone.nombre} (copia)`;
+            openEditor(clone, 'new');
+          }else if(act === 'deact'){
+            if(!confirm('¿Desactivar este producto? (Se ocultará en la tienda)')) return;
+            await doDeactivate(p);
+          }
+        });
+      });
+    }
+
+    // --- Desktop/PC: tabla ---
+    if(!tableBody) return;
 
     tableBody.innerHTML = items.map(p=>{
       const status = p.activo ? "Activo" : "Inactivo";

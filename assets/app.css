@@ -591,6 +591,48 @@ select.input{cursor:pointer}
 
 /* Admin */
 .tableWrap{overflow:auto}
+.acards{display:none}
+.acard{
+  background: var(--panel);
+  border:1px solid var(--border);
+  border-radius: var(--radius2);
+  box-shadow: var(--shadow2);
+  padding: 12px;
+  display:flex;
+  gap: 12px;
+  align-items:flex-start;
+}
+.acard .thumb{
+  width: 74px;
+  height: 74px;
+  border-radius: 16px;
+  overflow:hidden;
+  border:1px solid var(--border);
+  flex: 0 0 auto;
+  background: color-mix(in oklab, var(--brand) 18%, var(--panel));
+}
+.acard .thumb img{width:100%; height:100%; object-fit:cover}
+.acard .info{flex:1; min-width:0}
+.acard .name{font-weight:950; line-height:1.1}
+.acard .meta{color:var(--muted2); font-weight:700; font-size:12px; margin-top:4px}
+.acard .row{display:flex; gap:10px; flex-wrap:wrap; margin-top:8px; align-items:center}
+.acard .chip{
+  background: color-mix(in oklab, var(--panel) 80%, var(--bg));
+  border:1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-weight:900;
+  font-size:12px;
+}
+.acard .chip.good{color:var(--good)}
+.acard .chip.bad{color:var(--bad)}
+.acard .actions{
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+.acard .actions .btn{width:100%; justify-content:center}
 .table{
   width:100%;
   border-collapse: collapse;
@@ -688,6 +730,7 @@ ul{padding-left: 18px; margin: 10px 0}
   .adminLayout{grid-template-columns:1fr}
 }
 @media (max-width: 720px){
+  /* 2 productos por fila en móvil */
   .card{grid-column: span 6}
   .hero-inner{flex-direction:column; align-items:flex-start}
   .cta{width:100%; justify-content:flex-start}
@@ -696,10 +739,16 @@ ul{padding-left: 18px; margin: 10px 0}
   .headbtns{gap:8px}
 }
 @media (max-width: 460px){
-  .card{grid-column: span 12}
+  /* Mantener 2 por fila en la mayoría de móviles */
+  .card{grid-column: span 6}
   .searchbar{max-width:none}
   .btn{padding: 10px 12px}
   :root{--topbarH: 68px}
+}
+
+/* En pantallas MUY pequeñas, volver a 1 por fila */
+@media (max-width: 340px){
+  .card{grid-column: span 12}
 }
 
 
@@ -729,6 +778,17 @@ img.img-fallback{
   .headbtns{ width: 100%; justify-content:center; }
   .navbtn{ flex: 1 1 0; min-width: 0; max-width: 250px; }
   .iconpill{ width: 52px; height: 52px; }
+
+  /* tarjetas más compactas en móvil (2 por fila) */
+  .card-media img{ aspect-ratio: 1 / 1; }
+  .card-title{ font-size: 15px; }
+  .price{ font-size: 18px; }
+}
+
+/* Admin: evitar scroll horizontal en móvil */
+@media (max-width: 860px){
+  .tableWrap{display:none}
+  .acards{display:grid; gap: 12px}
 }
 
 /* --- Product card media keeps nice height even if image missing --- */
