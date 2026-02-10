@@ -12,24 +12,23 @@
 <body data-page="store">
   <header class="topbar" id="topbar">
     <div class="container">
-      <div class="topbar-inner">
-        <a class="brand" href="index.html" aria-label="Inicio">
+      <div class="topbar-inner topbar-stack">
+        <a class="brand brand-center" href="index.html" aria-label="Inicio">
           <img src="assets/logo.svg" alt="SD-COMAYAGUA" />
-          <div class="tagline">Pedidos rápidos por WhatsApp</div>
         </a>
 
-        <div class="header-actions">
-          <div class="searchbar">
-            <input id="qHome" type="search" placeholder="Buscar productos…" autocomplete="off" />
+        <div class="header-actions header-stack">
+          <div class="searchbar search-wide">
+            <input id="qHome" type="search" placeholder="Buscar productos (ej: audífonos)…" autocomplete="off" />
             <button class="iconbtn" id="clearSearch" type="button" aria-label="Limpiar búsqueda">✕</button>
           </div>
 
-          <div class="headbtns">
-            <button class="btn" id="catsBtn" type="button">☰ Categorías</button>
-            <button class="btn" id="themeBtn" type="button" title="Modo día/noche" aria-label="Modo día/noche">
+          <div class="headbtns headbtns-wide">
+            <button class="btn navbtn" id="catsBtn" type="button">☰ Categorías</button>
+            <button class="btn navbtn" id="adminBtn" type="button">🔒 Admin</button>
+            <button class="btn iconpill" id="themeBtn" type="button" title="Modo día/noche" aria-label="Modo día/noche">
               <span class="themeIcon" aria-hidden="true">🌙</span>
             </button>
-            <button class="btn primary" id="adminBtn" type="button">Admin</button>
           </div>
         </div>
       </div>
