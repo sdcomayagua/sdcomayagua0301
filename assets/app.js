@@ -1,316 +1,205 @@
-/* SDComayagua PRO Storefront + Admin (versión completa y depurada - febrero 2026) */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
 
-const $ = (s, r = document) => r.querySelector(s);
-const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
-
-function fmtMoney(value, currency = "Lps.", locale = "es-HN") {
-  const n = Number(value || 0);
-  if (!isFinite(n)) return String(value ?? "");
-  try {
-    return currency + "\u00A0" + n.toLocaleString(locale, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-  } catch { return currency + " " + n; }
+function fmtMoney(n) {
+  return "Lps. " + Number(n || 0).toLocaleString("es-HN");
 }
 
-function toast(msg, duration = 2200) {
-  const el = $("#toast");
-  if (!el) return;
-  el.textContent = msg;
-  el.style.display = "block";
-  clearTimeout(window.__toastT);
-  window.__toastT = setTimeout(() => el.style.display = "none", duration);
-}
-
-function getLS(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; } }
-function setLS(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch { } }
-
-function getConfig() {
-  const stored = getLS("SDCO_CONFIG", null);
-  return Object.assign({}, window.SDCO_DEFAULTS || {}, stored || {});
-}
-function setConfig(patch) {
-  const next = Object.assign({}, getConfig(), patch);
-  setLS("SDCO_CONFIG", next);
-  return next;
+function toast(msg) {
+  const t = $("#toast");
+  t.textContent = msg;
+  t.style.display = "block";
+  setTimeout(() => t.style.display = "none", 2500);
 }
 
 async function fetchJSON(url, opts = {}) {
-  console.log("[FETCH] " + (opts.method || "GET") + " " + url);
   const res = await fetch(url, opts);
   const text = await res.text();
-  let data;
-  try { data = JSON.parse(text); } catch { data = { ok: false, raw: text }; }
-  if (!res.ok) throw new Error(data?.error || "HTTP " + res.status);
-  console.log("[FETCH OK]", data);
-  return data;
+  try { return JSON.parse(text); } catch { return {ok:false, text}; }
 }
 
-const CACHE_KEY_PRODUCTS = "SDCO_PRODUCTS_CACHE_V1";
-const CACHE_TTL_MS = 5 * 60 * 1000;
+const CACHE_KEY = "SDCO_PRODUCTS";
+function getCache() { return JSON.parse(localStorage.getItem(CACHE_KEY) || "null"); }
+function setCache(data) { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); }
 
-function getCachedProducts() {
-  try {
-    const obj = JSON.parse(localStorage.getItem(CACHE_KEY_PRODUCTS) || "null");
-    if (!obj || Date.now() - obj.ts > CACHE_TTL_MS) return null;
-    console.log("[CACHE HIT]", obj.data.length, "productos");
-    return obj.data;
-  } catch { return null; }
-}
+async function loadProducts() {
+  let data = getCache();
+  if (data) return data;
 
-function setCachedProducts(data) {
-  try {
-    localStorage.setItem(CACHE_KEY_PRODUCTS, JSON.stringify({ ts: Date.now(), data }));
-    console.log("[CACHE SET]", data.length);
-  } catch { }
-}
-
-async function apiGetProducts() {
-  const cfg = getConfig();
-  const base = cfg.API_BASE_DEFAULT;
-  console.log("[API GET] Usando base:", base);
-
-  const tries = [
-    base + "?only=productos",
-    base + "?resource=productos",
-    base + "?only=products",
-    base + "?resource=products",
-    base
-  ];
-
-  let lastErr = null;
-  for (const u of tries) {
-    try {
-      const d = await fetchJSON(u);
-      if (d && d.ok && (d.productos || d.products)) return d.productos || d.products;
-      if (Array.isArray(d)) return d;
-      lastErr = new Error("Formato no reconocido");
-    } catch (e) { lastErr = e; }
+  const res = await fetchJSON("https://script.google.com/macros/s/AKfycbya37aSm80xgzd7mh4mG87_gRZzvl55xl4gt3X5hyCPvUeDg6chLJq7Qn97n_aqS3nI/exec?only=productos");
+  if (res.ok && res.productos) {
+    setCache(res.productos);
+    return res.productos;
   }
-  throw lastErr || new Error("No se pudo cargar productos");
+  throw new Error("No se cargaron productos");
 }
 
-async function apiPost(action, payload) {
-  const cfg = getConfig();
-  const base = cfg.API_BASE_DEFAULT;
-  const body = JSON.stringify(Object.assign({ action }, payload || {}));
-  return fetchJSON(base, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body
-  });
+let products = [];
+let currentCat = "Todos";
+
+function normalize(p) {
+  return {
+    id: p.id || Date.now().toString(),
+    nombre: p.nombre || "Sin nombre",
+    categoria: p.categoria || "Otros",
+    subcategoria: p.subcategoria || "General",
+    marca: p.marca || "",
+    precio: p.precio || "0",
+    stock: Number(p.stock) || 0,
+    activo: p.activo !== "0",
+    descripcion: p.descripcion || "",
+    img: p.img || "https://via.placeholder.com/300",
+    gallery: Array.from({length:8}, (_,i) => p[`galeria_${i+1}`]).filter(Boolean)
+  };
 }
 
-/* Theme (solo claro por ahora) */
-function applyTheme() {
-  try { localStorage.setItem("SDCO_THEME", "light"); } catch { }
-  document.documentElement.removeAttribute("data-theme");
+function getCategoryIcon(cat) {
+  const icons = {
+    "Celulares": "📱",
+    "Tecnología": "💻",
+    "Hogar": "🏠",
+    "Cocina": "🍳",
+    "Vehículos/Motos": "🏍️",
+    "Otros": "🛒"
+  };
+  return icons[cat] || "🛍️";
 }
 
-/* Storefront STATE */
-let STATE = {
-  productos: [],
-  filtered: [],
-  cats: [],
-  activeCat: "Todas",
-  subcats: [],
-  activeSubcat: "Todas",
-  q: "",
-  sort: "relevancia"
-};
-
-function normalizeProducts(list) {
-  const items = (list || []).map(p => ({
-    id: String(p.id ?? Date.now()),
-    nombre: String(p.nombre ?? "Sin nombre"),
-    categoria: String(p.categoria ?? "Otros"),
-    subcategoria: String(p.subcategoria ?? "General"),
-    marca: String(p.marca ?? ""),
-    precio: p.precio ?? "",
-    stock: Number(p.stock ?? 0),
-    activo: String(p.activo ?? "1") === "1" || String(p.activo ?? "").toLowerCase() === "true",
-    descripcion: String(p.descripcion ?? ""),
-    img: p.img || "",
-    gallery: Array.from({length:8}, (_,i) => p[`galeria_${i+1}`] || p[`gallery_${i+1}`]).filter(Boolean),
-    video_url: p.video_url || ""
-  })).filter(x => x.activo);
-
-  STATE.cats = ["Todas", ...new Set(items.map(x => x.categoria))].sort();
-  return items;
-}
-
-function deriveSubcats() {
-  if (STATE.activeCat === "Todas") {
-    STATE.subcats = [];
-    STATE.activeSubcat = "Todas";
-    return;
-  }
-  const subs = new Set(STATE.productos.filter(p => p.categoria === STATE.activeCat).map(p => p.subcategoria));
-  STATE.subcats = ["Todas", ...Array.from(subs).sort()];
-  STATE.activeSubcat = "Todas";
-}
-
-function filterAndSort() {
-  let res = STATE.productos;
-  if (STATE.activeCat !== "Todas") res = res.filter(p => p.categoria === STATE.activeCat);
-  if (STATE.activeSubcat !== "Todas") res = res.filter(p => p.subcategoria === STATE.activeSubcat);
-  if (STATE.q.trim()) {
-    const q = STATE.q.toLowerCase().trim();
-    res = res.filter(p => 
-      p.nombre.toLowerCase().includes(q) ||
-      p.descripcion.toLowerCase().includes(q) ||
-      p.marca.toLowerCase().includes(q)
-    );
-  }
-  if (STATE.sort === "precio_asc") res.sort((a,b) => Number(a.precio||0) - Number(b.precio||0));
-  if (STATE.sort === "precio_desc") res.sort((a,b) => Number(b.precio||0) - Number(a.precio||0));
-  STATE.filtered = res;
-}
-
-function renderProducts() {
+function renderProducts(filtered) {
   const grid = $("#grid");
   if (!grid) return;
-  if (STATE.filtered.length === 0) {
-    $("#empty").style.display = "block";
-    grid.innerHTML = "";
-    return;
-  }
-  $("#empty").style.display = "none";
-  grid.innerHTML = STATE.filtered.map(p => `
+
+  grid.innerHTML = filtered.map(p => `
     <div class="card" data-id="${p.id}">
-      <div class="img"><img src="${p.img || 'https://via.placeholder.com/300'}" alt="${p.nombre}" loading="lazy"></div>
+      <div class="img">
+        ${Number(p.precio) >= 500 ? '<div class="badge success">Envío Gratis</div>' : ''}
+        ${p.stock > 0 && p.stock <= 5 ? '<div class="badge warn">¡Solo ' + p.stock + '!</div>' : ''}
+        <img src="${p.img}" alt="${p.nombre}" loading="lazy">
+      </div>
       <div class="body">
-        <div class="title">${p.nombre}</div>
-        ${p.marca ? `<div class="meta">${p.marca}</div>` : ''}
+        <h4>${p.nombre}</h4>
+        <div class="meta">${p.marca ? p.marca + " • " : ""}${p.stock > 0 ? "Stock: " + p.stock : '<span style="color:#dc2626">Agotado</span>'}</div>
         <div class="price">${fmtMoney(p.precio)}</div>
-        <div class="stock">${p.stock > 0 ? `Stock: ${p.stock}` : '<span style="color:#dc2626">Agotado</span>'}</div>
-        <a href="https://wa.me/50431517755?text=Hola,%20me%20interesa%20${encodeURIComponent(p.nombre)}%20(ID:%20${p.id})" 
-           class="btn primary small" target="_blank" style="margin-top:8px;width:100%;text-align:center;">
-           Comprar por WhatsApp
-        </a>
+        <a href="https://wa.me/50431517755?text=Hola,%20quiero%20comprar%20${encodeURIComponent(p.nombre)}" target="_blank" class="btn primary small">Comprar por WhatsApp</a>
       </div>
     </div>
-  `).join('');
-
-  $$(".card").forEach(card => {
-    card.addEventListener("click", () => openModal(STATE.filtered.find(prod => prod.id === card.dataset.id)));
-  });
-}
-
-function openModal(p) {
-  if (!p) return;
-  $("#backdrop").style.display = "flex";
-  $("#mTitle").textContent = p.nombre;
-  $("#mSub").textContent = p.categoria + " • " + p.subcategoria;
-  $("#mMainImg").src = p.img || 'https://via.placeholder.com/600';
-  $("#mPrice").textContent = fmtMoney(p.precio);
-  $("#mDesc").textContent = p.descripcion || "Sin descripción.";
-  $("#mWA").href = `https://wa.me/50431517755?text=Hola,%20quiero%20comprar%20${encodeURIComponent(p.nombre)}%20(ID:%20${p.id})%20a%20${fmtMoney(p.precio)}`;
-  $("#mVideo").style.display = p.video_url ? "inline-block" : "none";
-  if (p.video_url) $("#mVideo").href = p.video_url;
-
-  const thumbs = $("#mThumbs");
-  thumbs.innerHTML = p.gallery.map(g => `<img src="${g}" alt="galería" class="thumb">`).join('');
-  $$(".thumb").forEach(t => t.addEventListener("click", () => $("#mMainImg").src = t.src));
+  `).join("");
 }
 
 function renderCategories() {
-  const catGrid = $("#catGrid");
-  if (!catGrid) return;
-  catGrid.innerHTML = STATE.cats.map(cat => `
+  const container = $("#catGrid");
+  if (!container) return;
+
+  const cats = ["Todos", ...new Set(products.map(p => p.categoria))].sort();
+  container.innerHTML = cats.map(cat => `
     <div class="cat-card" data-cat="${cat}">
+      <div class="cat-icon">${getCategoryIcon(cat)}</div>
       <div class="cat-name">${cat}</div>
     </div>
-  `).join('');
-  $$(".cat-card").forEach(c => c.addEventListener("click", () => showCatView(c.dataset.cat)));
+  `).join("");
+
+  $$(".cat-card").forEach(el => {
+    el.addEventListener("click", () => {
+      currentCat = el.dataset.cat;
+      filterProducts();
+    });
+  });
 }
 
-function showCatView(cat = "Todas") {
-  STATE.activeCat = cat;
-  deriveSubcats();
-  filterAndSort();
-  renderProducts();
-  $("#homeCats").style.display = "none";
-  $("#catView").style.display = "block";
-  $("#catTitle").textContent = cat === "Todas" ? "Todos los productos" : cat;
+function filterProducts() {
+  let filtered = products;
+  if (currentCat !== "Todos") filtered = filtered.filter(p => p.categoria === currentCat);
+  renderProducts(filtered);
 }
 
 async function bootStore() {
-  console.log("[STORE] Iniciando...");
-  $("#loading").style.display = "inline-block";
   try {
-    let prods = getCachedProducts();
-    if (!prods) {
-      prods = await apiGetProducts();
-      setCachedProducts(prods);
-    }
-    STATE.productos = normalizeProducts(prods);
+    const raw = await loadProducts();
+    products = raw.map(normalize).filter(p => p.activo);
     renderCategories();
-    showCatView("Todas");
+    filterProducts();
   } catch (err) {
-    console.error("[STORE ERROR]", err);
-    toast("Error cargando productos. Revisa consola.", 5000);
-  } finally {
-    $("#loading").style.display = "none";
+    console.error(err);
+    toast("Error cargando productos");
   }
 }
 
-/* ===== ADMIN ===== */
+/* Admin */
 function bootAdmin() {
-  console.log("[ADMIN] Iniciando panel");
-  const loginBox = $("#loginBox");
-  const adminUI = $("#adminUI");
   const key = localStorage.getItem("SDCO_ADMIN_KEY");
-
   if (key) {
+    $("#loginBox").style.display = "none";
+    $("#adminUI").style.display = "block";
     loadAdminProducts(key);
-    if (adminUI) adminUI.style.display = "flex";
-    if (loginBox) loginBox.style.display = "none";
   } else {
-    if (loginBox) loginBox.style.display = "block";
-    if (adminUI) adminUI.style.display = "none";
+    $("#loginBox").style.display = "block";
+    $("#adminUI").style.display = "none";
   }
 
-  $("#loginBtn")?.addEventListener("click", () => {
+  $("#loginBtn").onclick = () => {
     const k = $("#adminKey").value.trim();
-    if (!k) return toast("Ingresa la clave");
-    localStorage.setItem("SDCO_ADMIN_KEY", k);
-    location.reload();
-  });
+    if (k) {
+      localStorage.setItem("SDCO_ADMIN_KEY", k);
+      location.reload();
+    } else toast("Ingresa clave");
+  };
 
-  $("#logoutBtn")?.addEventListener("click", () => {
+  $("#logoutBtn").onclick = () => {
     localStorage.removeItem("SDCO_ADMIN_KEY");
     location.reload();
-  });
+  };
 }
 
 async function loadAdminProducts(key) {
-  $("#aloading").style.display = "inline";
   try {
-    const prods = await apiGetProducts();
+    const raw = await loadProducts();
     const tbody = $("#atable");
-    if (!tbody) return console.error("[ADMIN] Tabla #atable no encontrada");
-    tbody.innerHTML = prods.map(p => `
+    tbody.innerHTML = raw.map(p => `
       <tr>
         <td>${p.nombre}</td>
         <td>${fmtMoney(p.precio)}</td>
         <td>${p.stock}</td>
-        <td>${p.activo ? 'Activo' : 'Inactivo'}</td>
-        <td><button class="btn small edit" data-id="${p.id}">Editar</button></td>
+        <td>${p.activo ? "Activo" : "Inactivo"}</td>
+        <td>
+          <button class="btn small edit" data-id="${p.id}">Editar</button>
+          <button class="btn small delete" data-id="${p.id}">Eliminar</button>
+        </td>
       </tr>
-    `).join('');
-    console.log("[ADMIN] Lista cargada con", prods.length, "productos");
+    `).join("");
+
+    $$(".edit").forEach(b => b.onclick = e => editProduct(e.target.dataset.id));
+    $$(".delete").forEach(b => b.onclick = async e => {
+      if (confirm("¿Eliminar?")) {
+        await apiPost("deleteProduct", { adminKey: key, id: e.target.dataset.id });
+        toast("Eliminado");
+        loadAdminProducts(key);
+      }
+    });
   } catch (err) {
-    console.error("[ADMIN ERROR]", err);
-    toast("No se cargó la lista. Verifica clave.", 5000);
-  } finally {
-    $("#aloading").style.display = "none";
+    toast("Error en admin");
   }
+}
+
+function editProduct(id) {
+  toast("Editando ID: " + id + " (implementa modal aquí)");
+  // Aquí puedes abrir el modal de edición con los datos del producto
 }
 
 /* Init */
 window.addEventListener("DOMContentLoaded", () => {
-  console.log("[INIT] Página:", document.body.getAttribute("data-page"));
   applyTheme();
-  const page = document.body.getAttribute("data-page");
+  const page = document.body.dataset.page;
   if (page === "admin") bootAdmin();
   else bootStore();
+
+  $("#themeToggle")?.addEventListener("click", () => {
+    const isDark = document.documentElement.dataset.theme === "dark";
+    document.documentElement.dataset.theme = isDark ? "light" : "dark";
+    localStorage.setItem("theme", document.documentElement.dataset.theme);
+  });
+
+  $("#goCats")?.addEventListener("click", () => filterProducts());
+  $("#goAll")?.addEventListener("click", () => { currentCat = "Todos"; filterProducts(); });
+  $("#catsBtn")?.addEventListener("click", () => filterProducts());
+  $("#adminBtn")?.addEventListener("click", () => location.href = "admin.html");
 });
