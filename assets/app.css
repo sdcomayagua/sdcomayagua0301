@@ -330,6 +330,7 @@ select.input{cursor:pointer}
   cursor:pointer;
 }
 .card-media img{
+  display:block;
   width:100%;
   aspect-ratio: 4/3;
   object-fit: cover;
@@ -347,6 +348,23 @@ select.input{cursor:pointer}
   letter-spacing: .2px;
   backdrop-filter: blur(6px);
 }
+
+.card-media{
+  border-radius: calc(var(--radius) - 2px);
+  overflow:hidden;
+}
+.card-media::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: linear-gradient(120deg, rgba(2,132,199,.08), rgba(14,165,233,.12), rgba(2,132,199,.08));
+  opacity:.9;
+}
+.card-media img{
+  position:relative;
+  z-index:1;
+}
+
 .badge.offer{
   background: linear-gradient(180deg, #fb7185, #ef4444);
 }
@@ -676,6 +694,20 @@ select.input{cursor:pointer}
 ul{padding-left: 18px; margin: 10px 0}
 
 /* Responsive */
+
+@media (max-width: 720px){
+  .topbar-inner{flex-wrap:wrap; align-items:center}
+  .brand img{max-width:150px; height:auto}
+  .header-actions{width:100%; justify-content:space-between; gap:10px}
+  .searchbar{flex:1; min-width: 180px}
+  .btn.iconbtn{width:44px; justify-content:center; padding:10px}
+}
+@media (max-width: 460px){
+  .brand img{max-width:130px}
+  .header-actions{gap:8px}
+  .searchbar input{padding-right:34px}
+}
+
 @media (max-width: 920px){
   .mgrid{grid-template-columns: 1fr}
   .adminLayout{grid-template-columns:1fr}
