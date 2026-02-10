@@ -1,20 +1,20 @@
 /**
  * SDComayagua – Configuración base
- * - Puedes cambiarlo guardando un objeto JSON en localStorage con key: SDCO_CFG
- *   Ejemplo (en consola):
- *   localStorage.setItem('SDCO_CFG', JSON.stringify({ API_BASE:'TU_URL', WHATSAPP_NUMBER:'504...' }))
+ * Puedes guardar overrides así (en consola):
+ * localStorage.setItem('SDCO_CFG', JSON.stringify({ API_BASE:'TU_URL', WHATSAPP_NUMBER:'504...' }))
  */
 window.SDCO_DEFAULTS = {
   APP_NAME: "Soluciones Digitales Comayagua",
   SHORT_NAME: "SDComayagua",
   WHATSAPP_DISPLAY: "+504 3151-7755",
   WHATSAPP_NUMBER: "50431517755",
+  // Cambia esto si tu Apps Script es otro
   API_BASE_DEFAULT: "https://script.google.com/macros/s/AKfycbya37aSm80xgzd7mh4mG87_gRZzvl55xl4gt3X5hyCPvUeDg6chLJq7Qn97n_aqS3nI/exec",
   CURRENCY: "Lps.",
-  LOCALE: "es-HN"
+  LOCALE: "es-HN",
+  THEME_DEFAULT: "light" // light | dark
 };
 
-// Si existe configuración guardada, úsala encima del default
 try{
   const saved = JSON.parse(localStorage.getItem("SDCO_CFG")||"null");
   if(saved && typeof saved === "object"){
@@ -22,4 +22,4 @@ try{
   }
 }catch(e){}
 
-console.log("SDComayagua config → API:", window.SDCO_DEFAULTS.API_BASE || window.SDCO_DEFAULTS.API_BASE_DEFAULT);
+console.log("SDComayagua → API:", (window.SDCO_DEFAULTS.API_BASE || window.SDCO_DEFAULTS.API_BASE_DEFAULT));
