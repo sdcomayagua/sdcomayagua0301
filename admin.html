@@ -3,175 +3,48 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Admin | Soluciones Digitales Comayagua</title>
-  <meta name="description" content="Panel administrador para gestionar productos sin tocar código.">
+  <title>Admin | SD Comayagua</title>
   <link rel="stylesheet" href="assets/app.css">
   <script defer src="assets/config.js"></script>
   <script defer src="assets/app.js"></script>
 </head>
 <body data-page="admin">
   <header class="topbar">
-    <div class="container topbar-inner">
-      <div class="brand">
-        <img class="brandlogo" aria-label="SD Comayagua" src="assets/logo.svg" alt="SD Comayagua">
-      </div>
-      <div class="actions">
-        <button class="btn primary" id="storeBtn" type="button">🏪 Ver tienda</button>
-        <button class="btn" id="logoutBtn" type="button">🚪 Salir</button>
+    <div class="container">
+      <div class="topbar-inner">
+        <img class="brandlogo" src="assets/logo.svg" alt="SDComayagua">
+        <div>
+          <button class="btn primary" id="storeBtn">🏪 Ver tienda</button>
+          <button class="btn" id="logoutBtn">🚪 Salir</button>
+        </div>
       </div>
     </div>
   </header>
 
   <main class="container">
-    <!-- Login -->
-    <section class="panel" id="loginBox" style="display:none">
-      <div class="ph">
-        <h3>Iniciar sesión</h3>
-      </div>
-      <div class="pb">
-        <div class="kv">
-          <label>Clave de administrador (ADMIN_KEY)</label>
-          <input class="input" id="adminKey" placeholder="Escribe tu clave (ej: 199311)" type="password">
-          <button class="btn primary" id="loginBtn" type="button">Entrar</button>
-          <div class="help">Esta clave se guarda solo en tu navegador. Usa la misma que tienes en Apps Script.</div>
-        </div>
-      </div>
+    <section id="loginBox">
+      <h3>Iniciar sesión</h3>
+      <input id="adminKey" type="password" placeholder="Clave ADMIN">
+      <button id="loginBtn" class="btn primary">Entrar</button>
     </section>
 
-    <section class="admin-wrap" id="adminUI" style="display:none">
-      <!-- Left: config + quick actions -->
-      <div class="panel">
-        <div class="ph" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-          <h3 style="margin:0">Admin</h3>
-          <button class="btn" id="cfgToggle" type="button" aria-expanded="false">⚙️ Configuración</button>
-        </div>
-        <div class="pb" id="cfgPanel" style="display:none">
-          <div class="kv">
-            <label>Nombre de la tienda</label>
-            <input class="input" id="cfgNameA" value="Soluciones Digitales Comayagua">
-            <label>API Base (Apps Script WebApp)</label>
-            <input class="input" id="cfgApiA" value="https://script.google.com/macros/s/AKfycbya37aSm80xgzd7mh4mG87_gRZzvl55xl4gt3X5hyCPvUeDg6chLJq7Qn97n_aqS3nI/exec">
-            <label>WhatsApp (solo números)</label>
-            <input class="input" id="cfgWaA" value="50431517755">
-            <label>WhatsApp a mostrar</label>
-            <input class="input" id="cfgWaDisplayA" value="+504 3151-7755">
-            <label>Moneda</label>
-            <input class="input" id="cfgCurA" value="Lps.">
-            <button class="btn primary" id="cfgSaveA" type="button">Guardar configuración</button>
-            <div class="help">Cambios se guardan solo en este navegador.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Right: list -->
-      <div class="panel">
-        <div class="ph">
-          <div style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap">
-            <h3>Productos <span class="btn" id="aloading" style="display:none;pointer-events:none;">Cargando…</span></h3>
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <button class="btn" id="reloadBtn" type="button">Recargar</button>
-              <button class="btn primary" id="newBtn" type="button">Nuevo</button>
-            </div>
-          </div>
-          <div class="searchrow" style="margin-top:10px">
-            <input class="input" id="aq" placeholder="Buscar producto...">
-            <select class="input select" id="afCat"><option>Todas</option></select>
-            <select class="input select" id="afSub" style="display:none"><option>Todas</option></select>
-            <select class="input select" id="afActive">
-              <option value="todos">Todos</option>
-              <option value="activos">Activos</option>
-              <option value="inactivos">Inactivos</option>
-            </select>
-          </div>
-        </div>
-        <div class="pb" style="padding:0">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Producto</th>
-                <th>Precio</th>
-                <th>Stock</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody id="atable"></tbody>
-          </table>
-        </div>
-      </div>
+    <section id="adminUI" style="display:none">
+      <h2>Productos</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="atable"></tbody>
+      </table>
     </section>
   </main>
 
-  <!-- Editor Modal -->
-  <div class="backdrop" id="editBackdrop" style="display:none" role="dialog" aria-modal="true" aria-label="Editor">
-    <div class="modal modal-admin" style="max-width:980px">
-      <div class="modal-head">
-        <div>
-          <h3 id="editorTitle">Editar Producto</h3>
-          <p>Guarda cambios sin tocar código</p>
-        </div>
-        <button class="btn icon" id="closeEdit" aria-label="Cerrar">✕</button>
-      </div>
-      <div class="modal-body modal-grid">
-        <div class="kv">
-          <label>ID</label>
-          <input class="input" id="eid" readonly>
-          <label>Nombre</label>
-          <input class="input" id="enombre" placeholder="Ej: Cargador 20W Tipo C">
-          <label>Categoría</label>
-          <input class="input" id="ecat" placeholder="Ej: Celulares">
-          <label>Subcategoría</label>
-          <input class="input" id="esub" placeholder="Ej: Cargadores">
-          <label>Marca</label>
-          <input class="input" id="emarca" placeholder="Ej: Genérico / Samsung / Anker">
-          <label>Precio (número)</label>
-          <input class="input" id="eprecio" placeholder="Ej: 250">
-          <label>Stock</label>
-          <input class="input" id="estock" type="number" min="0" step="1">
-          <label style="display:flex;gap:10px;align-items:center">
-            <input type="checkbox" id="eactivo" checked> Activo (visible en la tienda)
-          </label>
-          <label>Descripción</label>
-          <textarea class="input" id="edesc" rows="6" placeholder="Describe el producto..."></textarea>
-        </div>
-
-        <div class="kv">
-          <label>Imagen principal (URL)</label>
-          <input class="input" id="eimg" placeholder="https://drive.google.com/uc?export=view&id=...">
-          <div class="imgprev" aria-label="Vista previa">
-            <img id="eimgPreview" alt="Vista previa del producto" style="max-height:180px">
-          </div>
-          <label>Video (opcional, URL)</label>
-          <input class="input" id="evideo" placeholder="https://www.youtube.com/...">
-          <div class="panel" style="box-shadow:none">
-            <div class="ph"><h3 style="font-size:13px">Galería (hasta 8 URLs)</h3></div>
-            <div class="pb" id="galleryFields" style="display:grid;gap:10px"></div>
-          </div>
-
-          <div class="panel" style="box-shadow:none">
-            <div class="ph"><h3 style="font-size:13px">Subir imágenes (opcional)</h3></div>
-            <div class="pb">
-              <input type="file" id="imgUpload" accept="image/*" multiple>
-              <div class="help">Sube imágenes → se guardan en Drive y se pegan las URLs automáticamente.</div>
-            </div>
-          </div>
-
-          <div class="help">Si "Guardar" falla, verifica que el backend tenga action=updateProduct.</div>
-        </div>
-      </div>
-      <div class="modal-foot modal-foot-admin">
-        <button class="btn" id="delBtn" type="button" style="display:none">Eliminar</button>
-        <div style="flex:1"></div>
-        <button class="btn" id="closeEdit2" type="button">Cerrar</button>
-        <button class="btn primary" id="saveBtn" type="button">Guardar</button>
-      </div>
-    </div>
-  </div>
-
   <div class="toast" id="toast"></div>
-
-  <script>
-    console.log("admin.html cargado – " + new Date().toLocaleString('es-HN'));
-  </script>
 </body>
 </html>
