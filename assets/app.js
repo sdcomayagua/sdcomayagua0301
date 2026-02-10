@@ -14,11 +14,11 @@ async function fetchProducts() {
 function renderCard(p) {
   return `
     <div class="card">
-      <img src="\( {p.img || 'https://via.placeholder.com/280x180?text=Producto'}" alt=" \){p.nombre}">
-      <h4>${p.nombre}</h4>
+      <img src="\( {p.img || 'https://via.placeholder.com/280x180?text=Producto'}" alt=" \){p.nombre || 'Producto'}">
+      <h4>${p.nombre || 'Sin nombre'}</h4>
       <div class="price">${fmtMoney(p.precio)}</div>
       <div class="stock">${p.stock > 0 ? 'Stock: ' + p.stock : 'Agotado'}</div>
-      <a href="https://wa.me/50431517755?text=Hola,%20quiero%20comprar%20${encodeURIComponent(p.nombre)}" target="_blank" class="btn primary">Comprar por WhatsApp</a>
+      <a href="https://wa.me/50431517755?text=Hola,%20quiero%20comprar%20${encodeURIComponent(p.nombre || 'producto')}" target="_blank" class="btn primary">Comprar por WhatsApp</a>
     </div>
   `;
 }
@@ -32,7 +32,7 @@ async function loadAndRender() {
     }
   } catch (e) {
     console.error(e);
-    $("#grid").innerHTML = '<p style="text-align:center;color:red;">Error al cargar productos. Revisa consola.</p>';
+    $("#grid").innerHTML = '<p style="text-align:center;color:red;">Error al cargar productos. Revisa consola (F12).</p>';
   }
 }
 
