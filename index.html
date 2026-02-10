@@ -9,7 +9,7 @@
   <script defer src="assets/config.js"></script>
   <script defer src="assets/app.js"></script>
 </head>
-<body>
+<body data-page="store">
   <header class="topbar">
     <div class="container">
       <img class="logo-wide" src="assets/logo.svg" alt="SD-COMAYAGUA">
@@ -32,7 +32,7 @@
     </section>
 
     <section id="catView">
-      <h2>Todos los productos</h2>
+      <h2 id="catTitle">Todos los productos</h2>
       <div class="toolbar">
         <input class="input" id="q" placeholder="Buscar...">
         <select class="input select" id="sort">
@@ -41,6 +41,8 @@
           <option value="precio_desc">Precio mayor a menor</option>
         </select>
       </div>
+
+      <div class="pillscroll" id="subPills"></div>
 
       <div id="empty" style="display:none;padding:40px;text-align:center;">No hay productos.</div>
 
