@@ -1,9 +1,11 @@
+// Funciones básicas
 const $ = s => document.querySelector(s);
 
 function fmtMoney(n) {
   return "Lps. " + Number(n || 0).toLocaleString("es-HN");
 }
 
+// Cargar productos desde la API
 async function fetchProducts() {
   const url = "https://script.google.com/macros/s/AKfycbya37aSm80xgzd7mh4mG87_gRZzvl55xl4gt3X5hyCPvUeDg6chLJq7Qn97n_aqS3nI/exec?only=productos";
   const res = await fetch(url);
@@ -11,6 +13,7 @@ async function fetchProducts() {
   return json.productos || [];
 }
 
+// Renderizar una tarjeta
 function renderCard(p) {
   return `
     <div class="card">
@@ -23,6 +26,7 @@ function renderCard(p) {
   `;
 }
 
+// Cargar y mostrar productos
 async function loadAndRender() {
   try {
     const prods = await fetchProducts();
@@ -36,4 +40,12 @@ async function loadAndRender() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", loadAndRender);
+// Eventos de botones
+document.addEventListener("DOMContentLoaded", () => {
+  loadAndRender();
+
+  $("#goCats")?.addEventListener("click", () => alert("Sección Categorías (próximamente)"));
+  $("#goAll")?.addEventListener("click", loadAndRender);
+  $("#catsBtn")?.addEventListener("click", () => alert("Menú de categorías"));
+  $("#adminBtn")?.addEventListener("click", () => location.href = "admin.html");
+});
