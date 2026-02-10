@@ -1,10 +1,11 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Admin | SD Comayagua</title>
-  <link rel="stylesheet" href="assets/app.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin | SDComayagua</title>
+  <meta name="robots" content="noindex" />
+  <link rel="stylesheet" href="assets/app.css" />
   <script defer src="assets/config.js"></script>
   <script defer src="assets/app.js"></script>
 </head>
@@ -12,39 +13,66 @@
   <header class="topbar">
     <div class="container">
       <div class="topbar-inner">
-        <img class="brandlogo" src="assets/logo.svg" alt="SDComayagua">
-        <div>
-          <button class="btn primary" id="storeBtn">🏪 Ver tienda</button>
-          <button class="btn" id="logoutBtn">🚪 Salir</button>
+        <div class="brand">
+          <img src="assets/logo.svg" alt="SD-COMAYAGUA" />
+        </div>
+
+        <div class="header-actions">
+          <button class="btn primary" id="storeBtn" type="button">🏪 Ver tienda</button>
+          <button class="btn" id="logoutBtn" type="button">🚪 Salir</button>
         </div>
       </div>
     </div>
   </header>
 
   <main class="container">
-    <section id="loginBox">
-      <h3>Iniciar sesión</h3>
-      <input id="adminKey" type="password" placeholder="Clave ADMIN">
-      <button id="loginBtn" class="btn primary">Entrar</button>
+    <section class="section" id="loginBox">
+      <div class="section-title">
+        <h2>Panel Admin</h2>
+        <div class="meta">Ingresá tu clave para ver el listado</div>
+      </div>
+
+      <div class="toolbar">
+        <input class="input" id="adminKey" type="password" placeholder="Clave ADMIN" autocomplete="current-password" />
+        <button class="btn primary" id="loginBtn" type="button">Entrar</button>
+      </div>
+
+      <div class="small" style="margin-top:10px">
+        Nota: si tu backend premium tiene acciones (doPost), aquí se puede conectar edición completa.
+      </div>
     </section>
 
-    <section id="adminUI" style="display:none">
-      <h2>Productos</h2>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Precio</th>
-            <th>Stock</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="atable"></tbody>
-      </table>
+    <section class="section" id="adminUI" style="display:none">
+      <div class="section-title">
+        <h2>Productos</h2>
+        <div class="meta">Vista rápida (precio/stock/estado)</div>
+      </div>
+
+      <div style="overflow:auto;margin-top:12px">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Precio</th>
+              <th>Stock</th>
+              <th>Estado</th>
+              <th>Notas</th>
+            </tr>
+          </thead>
+          <tbody id="atable"></tbody>
+        </table>
+      </div>
     </section>
+
+    <footer class="footer">
+      © <span id="year"></span> SDComayagua
+    </footer>
   </main>
 
   <div class="toast" id="toast"></div>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
