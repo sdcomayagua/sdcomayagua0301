@@ -43,9 +43,10 @@ function normalize(p) {
 
 function renderProducts() {
   const grid = $("#grid");
+  if (!grid) return;
   grid.innerHTML = products.map(p => `
     <div class="card">
-      <img src="${p.img}" alt="${p.nombre}">
+      <img src="\( {p.img}" alt=" \){p.nombre}">
       <h4>${p.nombre}</h4>
       <div class="price">${fmtMoney(p.precio)}</div>
       <div class="stock">${p.stock > 0 ? "Stock: " + p.stock : "Agotado"}</div>
