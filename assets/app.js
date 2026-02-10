@@ -182,6 +182,10 @@ function renderProducts() {
         ${p.marca ? `<div class="meta">${p.marca}</div>` : ''}
         <div class="price">${fmtMoney(p.precio)}</div>
         <div class="stock">${p.stock > 0 ? `Stock: ${p.stock}` : '<span style="color:#dc2626">Agotado</span>'}</div>
+        <a href="https://wa.me/50431517755?text=Hola,%20me%20interesa%20${encodeURIComponent(p.nombre)}%20(ID:%20${p.id})" 
+           class="btn primary small" target="_blank" style="margin-top:8px;width:100%;text-align:center;">
+           Comprar por WhatsApp
+        </a>
       </div>
     </div>
   `).join('');
