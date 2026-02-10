@@ -4,11 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Soluciones Digitales Comayagua | Tienda</title>
-  <meta name="description" content="Tienda online en Comayagua. Pedidos por WhatsApp. Accesorios para celular, tecnología, hogar y más.">
+  <meta name="description" content="Tienda online en Comayagua. Accesorios para celular, tecnología, hogar y más. Pedidos rápidos por WhatsApp.">
   <meta property="og:title" content="Soluciones Digitales Comayagua | Tienda">
-  <meta property="og:description" content="Productos para celular, tecnología, hogar y más. Pedidos por WhatsApp.">
+  <meta property="og:description" content="Productos reales, envíos locales. Pedidos por WhatsApp.">
   <meta property="og:type" content="website">
-  <meta property="og:locale" content="es_HN">
   <meta name="theme-color" content="#0284c7">
 
   <link rel="stylesheet" href="assets/app.css">
@@ -27,106 +26,90 @@
   </noscript>
 
   <header class="topbar">
-    <div class="container topbar-inner head3">
-      <div class="hrow hrow1">
-        <a class="hbrand" href="#top" aria-label="Inicio">
-          <img class="hlogo hlogo-wide" src="assets/logo.svg" alt="SDComayagua" width="220" height="54">
+    <div class="container">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 0;">
+        <a href="#" aria-label="Inicio">
+          <img src="assets/logo.svg" alt="SDComayagua" style="max-height:54px;">
         </a>
-      </div>
-
-      <div class="hrow hrow2" role="search" aria-label="Buscar productos">
-        <input class="input hsearch" id="qHome" placeholder="Buscar productos (ej: audífonos, cargador, USB)...">
-        <button class="btn icon hclear" id="clearHome" type="button" title="Limpiar" aria-label="Limpiar">✕</button>
-      </div>
-
-      <div class="hrow hrow3">
-        <button class="btn" id="catsBtn" type="button"><span class="btn-ico">☰</span> Categorías</button>
-        <button class="btn" id="adminBtn" type="button"><span class="btn-ico">🔒</span> Admin</button>
+        <div style="flex:1;max-width:500px;">
+          <input class="input" id="qHome" placeholder="Buscar productos..." style="width:100%;">
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn" id="catsBtn">☰ Categorías</button>
+          <button class="btn" id="adminBtn">🔒 Admin</button>
+        </div>
       </div>
     </div>
   </header>
 
   <main class="container">
-
-    <section class="hero2">
-      <div class="wrap">
-        <div>
-          <h2>Comprá rápido por categorías</h2>
-          <p>Elegí una categoría y pedí directo por WhatsApp. Sin complicaciones.</p>
-          <div class="cta">
-            <button class="btn primary" id="goCats" type="button">Ver categorías</button>
-            <button class="btn" id="goAll" type="button">Ver todo</button>
-            <span id="loading" style="display:none;">Cargando…</span>
-          </div>
-        </div>
-        <div style="display:grid;gap:10px">
-          <div class="kpi"><strong>✅ Productos reales</strong><span>Catálogo sincronizado</span></div>
-          <div class="kpi"><strong>🚚 Envíos locales</strong><span>Comayagua y alrededores</span></div>
-          <div class="kpi"><strong>📲 WhatsApp</strong><span>Respuesta rápida</span></div>
-        </div>
+    <section class="hero" style="margin:20px 0;padding:30px 20px;background:linear-gradient(135deg,#0284c7 0%,#0369a1 100%);color:white;border-radius:16px;text-align:center;">
+      <h1 style="margin:0;font-size:2rem;">Comprá rápido por categorías</h1>
+      <p style="margin:12px 0;font-size:1.1rem;">Pedí directo por WhatsApp sin complicaciones.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px;">
+        <button class="btn primary" id="goCats" style="padding:14px 28px;font-size:1.1rem;">Ver categorías</button>
+        <button class="btn" id="goAll" style="padding:14px 28px;font-size:1.1rem;background:white;color:#0284c7;">Ver todo</button>
       </div>
     </section>
 
     <section id="catView">
-      <div class="breadcrumb">
-        <button id="bcHome">Inicio</button> › <span id="bcCat">Todos los productos</span>
-      </div>
-
-      <div class="toolbar">
-        <h3 id="catTitle">Todos los productos</h3>
-        <div class="right">
-          <input class="input" id="q" placeholder="Buscar...">
+      <div class="toolbar" style="display:flex;justify-content:space-between;align-items:center;margin:20px 0;flex-wrap:wrap;gap:12px;">
+        <h2 id="catTitle" style="margin:0;">Todos los productos</h2>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <input class="input" id="q" placeholder="Buscar..." style="min-width:200px;">
           <select class="input select" id="sort">
             <option value="relevancia">Relevancia</option>
-            <option value="precio_asc">Precio menor a mayor</option>
-            <option value="precio_desc">Precio mayor a menor</option>
+            <option value="precio_asc">Precio menor → mayor</option>
+            <option value="precio_desc">Precio mayor → menor</option>
           </select>
         </div>
       </div>
 
-      <div class="pillscroll" id="subPills"></div>
+      <div class="pillscroll" id="subPills" style="display:flex;gap:8px;overflow:auto;padding:8px 0;"></div>
 
-      <section id="empty" class="empty" style="display:none">No hay productos.</section>
+      <section id="empty" class="empty" style="display:none;padding:40px;text-align:center;color:#64748b;">
+        No hay productos para mostrar.
+      </section>
 
-      <section class="grid products" id="grid"></section>
+      <section class="grid products" id="grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;"></section>
     </section>
 
-    <footer class="footer">
+    <footer class="footer" style="margin-top:40px;padding:20px;text-align:center;background:#0284c7;color:white;border-radius:16px;">
       © <span id="year"></span> Soluciones Digitales Comayagua • Tienda online
     </footer>
   </main>
 
-  <div class="backdrop" id="backdrop" style="display:none">
-    <div class="modal">
-      <div class="modal-head">
+  <div class="backdrop" id="backdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;z-index:100;">
+    <div class="modal" style="background:white;max-width:90%;width:800px;max-height:90vh;overflow:auto;border-radius:16px;box-shadow:0 20px 40px rgba(0,0,0,0.3);">
+      <div style="padding:16px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;">
         <div>
-          <h3 id="mTitle">Producto</h3>
-          <p id="mSub">Categoría</p>
+          <h3 id="mTitle" style="margin:0;">Producto</h3>
+          <p id="mSub" style="margin:4px 0 0;color:#64748b;"></p>
         </div>
-        <button class="btn icon" id="closeModal">✕</button>
+        <button id="closeModal" style="background:none;border:none;font-size:24px;cursor:pointer;">✕</button>
       </div>
-      <div class="modal-body">
+      <div style="padding:20px;display:grid;gap:20px;grid-template-columns:1fr 1fr;">
         <div>
-          <div class="mainimg"><img id="mMainImg" alt="Producto"></div>
-          <div class="thumbs" id="mThumbs"></div>
+          <img id="mMainImg" alt="Producto" style="width:100%;border-radius:12px;">
+          <div id="mThumbs" style="display:flex;gap:8px;margin-top:12px;overflow:auto;"></div>
         </div>
-        <div class="side">
-          <div class="row" id="mMeta"></div>
-          <div class="pricebig" id="mPrice">Lps. 0</div>
-          <div class="desc" id="mDesc"></div>
-          <div class="row" style="gap:10px">
-            <a class="btn primary" id="mWA" href="#" target="_blank">Comprar por WhatsApp</a>
-            <a class="btn" id="mVideo" href="#" target="_blank" style="display:none">Ver video</a>
+        <div>
+          <div id="mMeta" style="margin-bottom:12px;"></div>
+          <div id="mPrice" style="font-size:2.2rem;font-weight:800;color:#0284c7;margin:12px 0;"></div>
+          <div id="mDesc" style="color:#475569;line-height:1.5;"></div>
+          <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;">
+            <a id="mWA" class="btn primary" href="#" target="_blank" style="padding:14px 24px;font-weight:700;">Comprar por WhatsApp</a>
+            <a id="mVideo" class="btn" href="#" target="_blank" style="display:none;padding:14px 24px;">Ver video</a>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="toast" id="toast"></div>
+  <div class="toast" id="toast" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#dc2626;color:white;padding:12px 24px;border-radius:12px;display:none;z-index:100;"></div>
 
-  <a class="fab-wa" id="waFab" href="https://wa.me/50431517755" target="_blank">
-    💬 WhatsApp
+  <a class="fab-wa" id="waFab" href="https://wa.me/50431517755" target="_blank" style="position:fixed;bottom:20px;right:20px;background:#0284c7;color:white;padding:16px;border-radius:50%;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;font-size:1.2rem;z-index:99;">
+    💬
   </a>
 
   <script>
