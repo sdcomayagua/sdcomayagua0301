@@ -1,75 +1,131 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Soluciones Digitales Comayagua | Tienda</title>
-  <meta name="description" content="Tienda online en Comayagua. Accesorios para celular, tecnología, hogar y más. Pedidos rápidos por WhatsApp.">
-  <link rel="stylesheet" href="assets/app.css">
+  <meta name="description" content="Tienda online en Comayagua. Accesorios para celular, tecnología, hogar y más. Pedidos rápidos por WhatsApp." />
+  <link rel="stylesheet" href="assets/app.css" />
   <script defer src="assets/config.js"></script>
   <script defer src="assets/app.js"></script>
 </head>
 <body data-page="store">
   <header class="topbar">
     <div class="container">
-      <img class="logo-wide" src="assets/logo.svg" alt="SD-COMAYAGUA">
-      <div class="actions">
-        <input class="input search" id="qHome" placeholder="Buscar productos...">
-        <button class="btn" id="catsBtn">≡ Categorías</button>
-        <button class="btn" id="adminBtn">Admin</button>
+      <div class="topbar-inner">
+        <div class="brand">
+          <img src="assets/logo.svg" alt="SD-COMAYAGUA" />
+          <div class="tagline">Pedidos rápidos por WhatsApp</div>
+        </div>
+
+        <div class="header-actions">
+          <div class="searchbar">
+            <input id="qHome" type="search" placeholder="Buscar productos…" autocomplete="off" />
+            <div class="icon">🔎</div>
+          </div>
+          <button class="btn" id="catsBtn" type="button">☰ Categorías</button>
+          <button class="btn primary" id="adminBtn" type="button">Admin</button>
+        </div>
       </div>
     </div>
   </header>
 
   <main class="container">
     <section class="hero">
-      <h1>Comprá rápido por categorías</h1>
-      <p>Elegí una categoría, mirá los productos disponibles y pedí directo por WhatsApp. Sin complicaciones.</p>
-      <div class="cta">
-        <button class="btn primary" id="goCats">Ver categorías</button>
-        <button class="btn" id="goAll">Ver todo</button>
+      <div class="hero-inner">
+        <div>
+          <h1>Comprá rápido y sin complicaciones</h1>
+          <p>Elegí una categoría, encontrá lo que necesitás y pedí directo por WhatsApp. Stock actualizado y precios claros.</p>
+        </div>
+        <div class="cta">
+          <button class="btn primary" id="goCats" type="button">Ver categorías</button>
+          <button class="btn ghost" id="goAll" type="button">Ver todo</button>
+        </div>
       </div>
     </section>
 
-    <section id="catView">
-      <h2 id="catTitle">Todos los productos</h2>
+    <section class="section" id="catView">
+      <div class="section-title">
+        <h2 id="catTitle">Todos los productos</h2>
+        <div class="meta">Tip: tocá la foto para ver más imágenes</div>
+      </div>
+
       <div class="toolbar">
-        <input class="input" id="q" placeholder="Buscar...">
-        <select class="input select" id="sort">
+        <input class="input" id="q" type="search" placeholder="Buscar por nombre, categoría o descripción…" autocomplete="off" />
+        <select class="input" id="sort">
           <option value="relevancia">Relevancia</option>
           <option value="precio_asc">Precio menor a mayor</option>
           <option value="precio_desc">Precio mayor a menor</option>
         </select>
       </div>
 
-      <div class="pillscroll" id="subPills"></div>
+      <div class="pillscroll" id="subPills" style="display:none"></div>
 
-      <div id="empty" style="display:none;padding:40px;text-align:center;">No hay productos.</div>
+      <div id="empty" class="small" style="display:none;padding:22px 8px;text-align:center;">
+        No hay productos para mostrar.
+      </div>
 
       <div class="grid" id="grid"></div>
     </section>
 
     <footer class="footer">
-      © <span id="year"></span> Soluciones Digitales Comayagua • Tienda online
+      © <span id="year"></span> Soluciones Digitales Comayagua • SDComayagua
     </footer>
   </main>
 
-  <div class="backdrop" id="backdrop" style="display:none">
-    <div class="modal">
-      <button id="closeModal" class="close">✕</button>
-      <h3 id="mTitle"></h3>
-      <p id="mSub"></p>
-      <img id="mMainImg" alt="Producto">
-      <div id="mThumbs"></div>
-      <div id="mPrice"></div>
-      <p id="mDesc"></p>
-      <a id="mWA" class="btn primary" href="#" target="_blank">Comprar por WhatsApp</a>
+  <!-- Modal de producto -->
+  <div class="backdrop" id="backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <div>
+          <h3 id="mTitle">Producto</h3>
+          <div class="small" id="mSub"></div>
+        </div>
+        <button id="closeModal" class="close" type="button" aria-label="Cerrar">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="mgrid">
+          <div>
+            <div class="mmain">
+              <img id="mMainImg" alt="Producto" />
+            </div>
+            <div class="mthumbs" id="mThumbs"></div>
+          </div>
+          <div class="mmeta">
+            <div class="price" id="mPrice"></div>
+            <div class="kv">
+              <span>Pago y pedido por WhatsApp</span>
+              <span>Envíos en Comayagua</span>
+            </div>
+            <div class="desc" id="mDesc"></div>
+            <div class="formrow">
+              <a id="mWA" class="btn primary" href="#" target="_blank" rel="noopener">Comprar por WhatsApp</a>
+              <a id="mVideo" class="btn ghost" href="#" target="_blank" rel="noopener" style="display:none">🎬 Ver video</a>
+            </div>
+            <div class="small">Si no te aparece “Compartir” en tu celular, se copia el link automáticamente.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de categorías -->
+  <div class="backdrop" id="catModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <h3 style="margin:0">Categorías</h3>
+        <button id="closeCatModal" class="close" type="button" aria-label="Cerrar">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="small" style="margin-bottom:10px">Elegí una categoría para filtrar.</div>
+        <div class="pillscroll" id="catList" style="flex-wrap:wrap;overflow:visible"></div>
+      </div>
     </div>
   </div>
 
   <div class="toast" id="toast"></div>
 
-  <a class="fab-wa" href="https://wa.me/50431517755" target="_blank">💬</a>
+  <a class="fab-wa" href="https://wa.me/50431517755" target="_blank" rel="noopener" aria-label="WhatsApp">💬</a>
 
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
