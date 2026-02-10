@@ -4,81 +4,86 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Soluciones Digitales Comayagua | Tienda</title>
-  <meta name="description" content="Tienda online en Comayagua. Pedidos por WhatsApp. Accesorios para celular, tecnología, hogar y más.">
+  <meta name="description" content="Tienda online en Comayagua. Accesorios para celular, tecnología, hogar y más. Pedidos rápidos por WhatsApp.">
   <meta property="og:title" content="Soluciones Digitales Comayagua | Tienda">
-  <meta property="og:description" content="Productos reales, envíos locales. Pedidos por WhatsApp.">
+  <meta property="og:description" content="Productos reales, envíos locales en Comayagua y alrededores.">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="es_HN">
-  <meta name="theme-color" content="#0284c7">
+  <meta name="theme-color" content="#0ea5e9">
 
   <link rel="stylesheet" href="assets/app.css">
   <script defer src="assets/config.js"></script>
   <script defer src="assets/app.js"></script>
 </head>
 <body data-page="store">
-  <header class="topbar">
+  <noscript>
+    <div class="container" style="padding:40px 20px;text-align:center;background:#fff;color:#000;">
+      <h2>¡JavaScript está desactivado!</h2>
+      <p>Esta tienda necesita JavaScript para cargar los productos y categorías.</p>
+      <p>Por favor activa JavaScript en tu navegador o prueba con otro (Chrome, Firefox, Edge).</p>
+      <p>Mientras tanto, puedes contactarnos directamente por WhatsApp:</p>
+      <a href="https://wa.me/50431517755" class="btn primary" style="display:inline-block;margin:20px;padding:15px 30px;font-size:18px;">Chatear ahora →</a>
+    </div>
+  </noscript>
+
+  <header class="header">
     <div class="container">
-      <img class="logo-wide" src="assets/logo.svg" alt="SD-COMAYAGUA">
-      <div class="actions">
-        <input class="input search" id="qHome" placeholder="Buscar productos...">
-        <button class="btn" id="catsBtn">≡ Categorías</button>
-        <button class="btn" id="adminBtn">Admin</button>
+      <div class="head3">
+        <a href="#" class="logo-wide" aria-label="Inicio">
+          <img src="assets/img/logo-wide.png" alt="Soluciones Digitales Comayagua">
+        </a>
+        <button id="menuBtn" aria-label="Menú" class="btn-icon">☰</button>
       </div>
+      <nav id="nav" class="nav" aria-hidden="true">
+        <a href="#home">Inicio</a>
+        <a href="#cats">Categorías</a>
+        <a href="#all">Todo</a>
+        <a href="#envios">Envíos</a>
+        <a href="#nosotros">Nosotros</a>
+      </nav>
     </div>
   </header>
 
-  <main class="container">
-    <section class="hero">
-      <h1>Comprá rápido por categorías</h1>
-      <p>Elegí una categoría, mirá los productos disponibles y pedí directo por WhatsApp. Sin complicaciones.</p>
-      <div class="cta">
-        <button class="btn primary" id="goCats">Ver categorías</button>
-        <button class="btn" id="goAll">Ver todo</button>
+  <main class="main">
+    <section id="home" class="hero">
+      <div class="container">
+        <h1>Comprá rápido por categorías</h1>
+        <p>Pedí directo por WhatsApp sin registrarte.</p>
+        <a href="#cats" class="btn primary">Ver categorías</a>
+        <a href="#all" class="btn outline">Ver todo</a>
       </div>
     </section>
 
-    <section id="catView">
-      <h2 id="catTitle">Todos los productos</h2>
-      <div class="toolbar">
-        <input class="input" id="q" placeholder="Buscar...">
-        <select class="input select" id="sort">
-          <option value="relevancia">Relevancia</option>
-          <option value="precio_asc">Precio menor a mayor</option>
-          <option value="precio_desc">Precio mayor a menor</option>
-        </select>
+    <section id="cats" class="section">
+      <div class="container">
+        <h2>Categorías</h2>
+        <div id="homeCats" class="cat-grid"></div>
       </div>
-
-      <div class="pillscroll" id="subPills"></div>
-
-      <div id="empty" style="display:none;padding:40px;text-align:center;">No hay productos.</div>
-
-      <div class="grid" id="grid"></div>
     </section>
 
-    <footer class="footer">
-      © <span id="year"></span> Soluciones Digitales Comayagua • Tienda online
-    </footer>
+    <section id="all" class="section">
+      <div class="container">
+        <h2>Catálogo completo</h2>
+        <div id="grid" class="grid"></div>
+      </div>
+    </section>
+
+    <section id="envios" class="section">
+      <div class="container">
+        <h2>Envíos en Comayagua</h2>
+        <p>Entregamos en la ciudad y Siguatepeque. Preguntá por tu zona.</p>
+      </div>
+    </section>
+
+    <section id="nosotros" class="section">
+      <div class="container">
+        <h2>Sobre nosotros</h2>
+        <p>Soluciones Digitales Comayagua: accesorios y tecnología real para tu día a día.</p>
+      </div>
+    </section>
   </main>
 
-  <div class="backdrop" id="backdrop" style="display:none">
-    <div class="modal">
-      <button id="closeModal" class="close">✕</button>
-      <h3 id="mTitle"></h3>
-      <p id="mSub"></p>
-      <img id="mMainImg" alt="Producto">
-      <div id="mThumbs"></div>
-      <div id="mPrice"></div>
-      <p id="mDesc"></p>
-      <a id="mWA" class="btn primary" href="#" target="_blank">Comprar por WhatsApp</a>
-    </div>
-  </div>
-
-  <div class="toast" id="toast"></div>
-
-  <a class="fab-wa" href="https://wa.me/50431517755" target="_blank">💬</a>
-
-  <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
-  </script>
-</body>
-</html>
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <button id="closeModal" class="btn-icon close">&times;</button>
+      <div id="modalBody"></div
