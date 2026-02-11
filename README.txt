@@ -1,8 +1,7 @@
 SDComayagua Tienda PRO (Preconfigurada)
 
-✅ Ya viene configurada con:
-- Sheet_ID: 137zlNBENZF1N8w_dZbh0OF1PEhQJ9GHlY7d_r7Shsso
-- WebApp (API_BASE): https://script.google.com/macros/s/AKfycbya37aSm80xgzd7mh4mG87_gRZzvl55xl4gt3X5hyCPvUeDg6chLJq7Qn97n_aqS3nI/exec
+✅ Ya viene lista, solo falta pegar TU URL nueva del WebApp (/exec).
+   (La URL anterior no guardaba desde Admin porque no tenía doPost)
 
 PASOS RÁPIDOS:
 
@@ -28,6 +27,15 @@ PASOS RÁPIDOS:
    - Sube los archivos (index.html, admin.html y carpeta assets) a tu hosting / GitHub Pages / Netlify.
    - Abre index.html → ya debe cargar productos automáticamente.
    - Abre admin.html → pega tu ADMIN_KEY y administra sin tocar código.
+
+   IMPORTANTE:
+   - Edita assets/config.js y reemplaza:
+       API_BASE_DEFAULT: "PASTE_YOUR_NEW_WEBAPP_EXEC_URL_HERE"
+     por tu nueva URL del WebApp que termina en /exec
+
+   - Si antes guardaste configuración en el navegador, bórrala para que tome el nuevo API:
+       localStorage.removeItem('SDCO_CFG')
+       localStorage.removeItem('SDCO_ADMIN_KEY')
 
 NOTA:
 - Si tu WebApp URL cambia, en la tienda puedes tocar “Config” y pegar la nueva sin editar archivos.
