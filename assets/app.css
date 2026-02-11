@@ -110,7 +110,8 @@ textarea{resize:vertical}
 }
 .headbtns-wide{ width:100%; justify-content:center; }
 .navbtn{ padding: 14px 18px; border-radius: 999px; font-weight:900; }
-.iconpill{ width:52px; height:52px; border-radius: 999px; display:inline-flex; align-items:center; justify-content:center; }
+.iconpill{ width:44px; height:44px; border-radius: 999px; display:inline-flex; align-items:center; justify-content:center; padding:0; }
+.iconpill .themeIcon{ font-size: 18px; line-height: 1; }
 .topbar-stack{ flex-wrap:wrap; }
 .search-wide{ width:100%; max-width: 760px; }
 .searchbar{
@@ -338,7 +339,7 @@ select.input{cursor:pointer}
 .card-media img{
   width:100%;
   display:block;
-  aspect-ratio: 4/3;
+  aspect-ratio: 1/1;
   object-fit: cover;
   background: color-mix(in oklab, var(--panel) 85%, transparent);
 }
@@ -465,8 +466,9 @@ select.input{cursor:pointer}
 }
 .mmain img{
   width:100%;
-  aspect-ratio: 4/3;
-  object-fit: cover;
+  aspect-ratio: 1/1;
+  object-fit: contain;
+  background: color-mix(in oklab, var(--panel) 92%, transparent);
 }
 .mbadges{
   position:absolute;
@@ -490,9 +492,10 @@ select.input{cursor:pointer}
   cursor:pointer;
   overflow:hidden;
   width: 76px;
+  height: 76px;
   flex: 0 0 76px;
 }
-.thumb img{width:100%; height: 58px; object-fit:cover}
+.thumb img{width:100%; height: 100%; object-fit:cover}
 .thumb.active{
   border-color: color-mix(in oklab, var(--brand) 55%, var(--border));
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand) 16%, transparent);
@@ -521,32 +524,78 @@ select.input{cursor:pointer}
 }
 .formrow .btn.primary{flex:1}
 
-/* Categories modal */
+/* Categories modal (premium tiles) */
 .catGrid{
   display:grid;
   grid-template-columns: repeat(2, 1fr);
-  gap:10px;
+  gap:12px;
 }
 .catCard{
-  border:1px solid var(--border);
-  border-radius: 16px;
-  padding: 12px;
-  background: color-mix(in oklab, var(--panel) 70%, transparent);
+  border:1px solid color-mix(in oklab, var(--border) 85%, transparent);
+  border-radius: 18px;
+  padding: 14px;
   cursor:pointer;
   display:flex;
   justify-content:space-between;
   align-items:center;
-  gap:10px;
-  font-weight: 900;
+  gap:12px;
+  text-align:left;
+  background: linear-gradient(135deg,
+    color-mix(in oklab, #0b1220 72%, var(--panel)),
+    color-mix(in oklab, #0b1220 55%, var(--panel))
+  );
+  color: #e5e7eb;
+  box-shadow: 0 10px 30px rgba(2,6,23,.15);
+  position:relative;
+  overflow:hidden;
 }
-.catCard:hover{
-  border-color: color-mix(in oklab, var(--brand) 45%, var(--border));
-  background: color-mix(in oklab, var(--brand) 10%, var(--panel));
+.catCard::before{
+  content:"";
+  position:absolute;
+  inset:-70px -70px auto auto;
+  width: 200px;
+  height: 200px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.08);
+  filter: blur(1px);
+  opacity: .9;
 }
-.catCard .count{
-  color: var(--muted2);
-  font-weight: 850;
+.catCard::after{
+  content:"";
+  position:absolute;
+  inset:auto auto -70px -70px;
+  width: 190px;
+  height: 190px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.05);
+  filter: blur(1px);
+  opacity: .8;
 }
+.catCard > *{ position:relative; z-index:1; }
+.catCard.active{ outline: 3px solid color-mix(in oklab, var(--brand) 35%, transparent); }
+.catCard:hover{ transform: translateY(-1px); }
+.catL{ display:flex; align-items:center; gap:12px; }
+.catIcon{
+  width: 44px; height: 44px; border-radius: 14px;
+  display:flex; align-items:center; justify-content:center;
+  font-size: 22px;
+  background: rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.10);
+}
+.catTxt{ display:flex; flex-direction:column; gap:2px; }
+.catName{ font-weight: 950; letter-spacing:.2px; }
+.catHint{ font-size: 12px; color: rgba(229,231,235,.75); }
+.catR{ display:flex; flex-direction:column; align-items:flex-end; }
+.catCount{ font-size: 12px; color: rgba(229,231,235,.85); font-weight: 850; }
+.catCard.tint-a .catIcon{ box-shadow: 0 0 0 6px rgba(59,130,246,.12) inset; }
+.catCard.tint-b .catIcon{ box-shadow: 0 0 0 6px rgba(236,72,153,.12) inset; }
+.catCard.tint-c .catIcon{ box-shadow: 0 0 0 6px rgba(34,197,94,.12) inset; }
+.catCard.tint-d .catIcon{ box-shadow: 0 0 0 6px rgba(245,158,11,.12) inset; }
+
+.catCard.tint-a{ background: linear-gradient(135deg, rgba(59,130,246,.25), rgba(15,23,42,.92)); }
+.catCard.tint-b{ background: linear-gradient(135deg, rgba(236,72,153,.24), rgba(15,23,42,.92)); }
+.catCard.tint-c{ background: linear-gradient(135deg, rgba(34,197,94,.22), rgba(15,23,42,.92)); }
+.catCard.tint-d{ background: linear-gradient(135deg, rgba(245,158,11,.22), rgba(15,23,42,.92)); }
 
 /* Footer */
 .footer{
@@ -734,7 +783,7 @@ ul{padding-left: 18px; margin: 10px 0}
   .card{grid-column: span 6}
   .hero-inner{flex-direction:column; align-items:flex-start}
   .cta{width:100%; justify-content:flex-start}
-  .catGrid{grid-template-columns: 1fr}
+  .catGrid{grid-template-columns: repeat(2, 1fr)}
   .brand .tagline{display:none}
   .headbtns{gap:8px}
 }
@@ -777,12 +826,16 @@ img.img-fallback{
   .searchbar{ width: 100%; max-width: 680px; }
   .headbtns{ width: 100%; justify-content:center; }
   .navbtn{ flex: 1 1 0; min-width: 0; max-width: 250px; }
-  .iconpill{ width: 52px; height: 52px; }
+  .iconpill{ width: 44px; height: 44px; }
 
   /* tarjetas más compactas en móvil (2 por fila) */
   .card-media img{ aspect-ratio: 1 / 1; }
   .card-title{ font-size: 15px; }
   .price{ font-size: 18px; }
+}
+
+@media (max-width: 360px){
+  .catGrid{grid-template-columns: 1fr}
 }
 
 /* Admin: evitar scroll horizontal en móvil */

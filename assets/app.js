@@ -85,6 +85,21 @@ function shareIcon(){
   </svg>`;
 }
 
+/* ---------------- Category visuals ---------------- */
+function categoryVisual(name){
+  const n = String(name||"").toLowerCase();
+  // emoji fallback (lightweight, no extra images)
+  if(n.includes("celular")) return { emoji:"📱", tint:"tint-a" };
+  if(n.includes("gamer") || n.includes("gaming")) return { emoji:"🎮", tint:"tint-b" };
+  if(n.includes("hogar")) return { emoji:"🏠", tint:"tint-c" };
+  if(n.includes("cocina")) return { emoji:"🍳", tint:"tint-c" };
+  if(n.includes("tecnolog")) return { emoji:"💻", tint:"tint-a" };
+  if(n.includes("veh") || n.includes("moto")) return { emoji:"🏍️", tint:"tint-d" };
+  if(n.includes("audio") || n.includes("aud")) return { emoji:"🎧", tint:"tint-b" };
+  if(n.includes("almacen") || n.includes("usb") || n.includes("micro")) return { emoji:"💾", tint:"tint-a" };
+  return { emoji:"🛍️", tint:"tint-a" };
+}
+
 /* ---------------- Data: products ---------------- */
 function cryptoId(){
   try{
@@ -456,10 +471,20 @@ Link del producto: ${url.toString()}
       ,...entries.map(([name, info])=>({name, count: info.count}))
     ];
     els.catList.innerHTML = items.map(o=>{
+      const v = categoryVisual(o.name);
       const active = (o.name==="Todos" && state.activeCat==="Todos") || (o.name===state.activeCat);
-      return `<button class="catCard" data-cat="${encodeURIComponent(o.name)}" type="button">
-        <span>${escapeHtml(o.name)}</span>
-        <span class="count">${o.count}</span>
+      const countText = `${o.count} ${o.count===1?"producto":"productos"}`;
+      return `<button class="catCard ${active?"active":""} ${v.tint}" data-cat="${encodeURIComponent(o.name)}" type="button">
+        <div class="catL">
+          <div class="catIcon" aria-hidden="true">${v.emoji}</div>
+          <div class="catTxt">
+            <div class="catName">${escapeHtml(o.name)}</div>
+            <div class="catHint">Toca para ver</div>
+          </div>
+        </div>
+        <div class="catR">
+          <div class="catCount">${countText}</div>
+        </div>
       </button>`;
     }).join("");
 
@@ -568,7 +593,7 @@ Link del producto: ${url.toString()}
           </div>
 
           <div class="card-actions">
-            <a class="btn primary" ${agotado ? "aria-disabled='true' style='pointer-events:none;opacity:.6'" : ""} href="${buildWA(p)}" target="_blank" rel="noopener">Comprar</a>
+            <button class="btn primary" data-open="1" type="button">Ver detalles</button>
             <button class="btn icon iconbtn" data-share="1" type="button" title="Compartir" aria-label="Compartir">
               ${shareIcon()}
             </button>
