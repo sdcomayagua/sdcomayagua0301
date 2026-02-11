@@ -110,7 +110,7 @@ textarea{resize:vertical}
 }
 .headbtns-wide{ width:100%; justify-content:center; }
 .navbtn{ padding: 14px 18px; border-radius: 999px; font-weight:900; }
-.iconpill{ width:44px; height:44px; border-radius: 999px; display:inline-flex; align-items:center; justify-content:center; padding:0; }
+.iconpill{ width:40px; height:40px; border-radius: 999px; display:inline-flex; align-items:center; justify-content:center; padding:0; }
 .iconpill .themeIcon{ font-size: 18px; line-height: 1; }
 .topbar-stack{ flex-wrap:wrap; }
 .search-wide{ width:100%; max-width: 760px; }
@@ -431,6 +431,9 @@ select.input{cursor:pointer}
   border:1px solid var(--border);
   box-shadow: var(--shadow);
   overflow:hidden;
+  max-height: calc(100dvh - 32px);
+  display:flex;
+  flex-direction:column;
 }
 .modal.wide{width:min(980px,100%)}
 .modal-head{
@@ -451,7 +454,11 @@ select.input{cursor:pointer}
   font-weight: 900;
 }
 .close:hover{background: color-mix(in oklab, var(--panel) 70%, transparent)}
-.modal-body{padding: 14px}
+.modal-body{
+  padding: 14px;
+  overflow:auto;
+  -webkit-overflow-scrolling: touch;
+}
 .mgrid{
   display:grid;
   grid-template-columns: 1.15fr .85fr;
@@ -459,6 +466,8 @@ select.input{cursor:pointer}
 }
 .mmain{
   position:relative;
+  aspect-ratio: 1 / 1;
+  max-height: 45vh;
   border-radius: var(--radius);
   overflow:hidden;
   border:1px solid var(--border);
@@ -466,8 +475,8 @@ select.input{cursor:pointer}
 }
 .mmain img{
   width:100%;
-  aspect-ratio: 1/1;
-  object-fit: contain;
+  height:100%;
+  object-fit: cover;
   background: color-mix(in oklab, var(--panel) 92%, transparent);
 }
 .mbadges{
@@ -524,14 +533,14 @@ select.input{cursor:pointer}
 }
 .formrow .btn.primary{flex:1}
 
-/* Categories modal (premium tiles) */
+/* Categories modal (clean tiles) */
 .catGrid{
   display:grid;
   grid-template-columns: repeat(2, 1fr);
   gap:12px;
 }
 .catCard{
-  border:1px solid color-mix(in oklab, var(--border) 85%, transparent);
+  border:1px solid var(--border);
   border-radius: 18px;
   padding: 14px;
   cursor:pointer;
@@ -540,74 +549,36 @@ select.input{cursor:pointer}
   align-items:center;
   gap:12px;
   text-align:left;
-  background: linear-gradient(135deg,
-    color-mix(in oklab, #0b1220 72%, var(--panel)),
-    color-mix(in oklab, #0b1220 55%, var(--panel))
-  );
-  color: #e5e7eb;
-  box-shadow: 0 10px 30px rgba(2,6,23,.15);
-  position:relative;
-  overflow:hidden;
+  background: var(--panel);
+  box-shadow: var(--shadow2);
+  transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
 }
-.catCard::before{
-  content:"";
-  position:absolute;
-  inset:-70px -70px auto auto;
-  width: 200px;
-  height: 200px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.08);
-  filter: blur(1px);
-  opacity: .9;
-}
-.catCard::after{
-  content:"";
-  position:absolute;
-  inset:auto auto -70px -70px;
-  width: 190px;
-  height: 190px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.05);
-  filter: blur(1px);
-  opacity: .8;
-}
-.catCard > *{ position:relative; z-index:1; }
-.catCard.active{ outline: 3px solid color-mix(in oklab, var(--brand) 35%, transparent); }
 .catCard:hover{ transform: translateY(-1px); }
-.catL{ display:flex; align-items:center; gap:12px; }
+.catCard.active{
+  border-color: color-mix(in oklab, var(--brand) 55%, var(--border));
+  box-shadow: 0 18px 42px rgba(2,6,23,.14);
+}
+.catL{ display:flex; align-items:center; gap:12px; min-width: 0; }
 .catIcon{
-  width: 46px; height: 46px; border-radius: 14px;
+  width: 46px; height: 46px; border-radius: 16px;
   display:flex; align-items:center; justify-content:center;
-  background: rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.10);
-  color: rgba(255,255,255,.92);
+  background: color-mix(in oklab, var(--brand) 10%, var(--panel));
+  border:1px solid color-mix(in oklab, var(--brand) 20%, var(--border));
 }
-.catIcon img{
-  width: 26px; height: 26px;
-  display:block;
-  filter: drop-shadow(0 8px 14px rgba(0,0,0,.18));
-}
-.catTxt{ display:flex; flex-direction:column; gap:2px; }
-.catName{ font-weight: 950; letter-spacing:.2px; }
-.catHint{ font-size: 12px; color: rgba(229,231,235,.75); }
+.catIcon img{ width: 26px; height: 26px; display:block; }
+.catTxt{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+.catName{ font-weight: 950; letter-spacing:.2px; text-transform: capitalize; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.catHint{ font-size: 12px; color: var(--muted2); }
 .catR{ display:flex; flex-direction:column; align-items:flex-end; }
-.catCount{ font-size: 12px; color: rgba(229,231,235,.85); font-weight: 850; }
-.catCard
-/* Iconos en modo claro */
-.light .catIcon{
-  background: rgba(15,23,42,.06);
-  border-color: rgba(15,23,42,.10);
-  color: rgba(15,23,42,.85);
+.catCount{
+  font-size: 12px;
+  font-weight: 950;
+  color: var(--muted);
+  background: color-mix(in oklab, var(--panel) 70%, transparent);
+  border:1px solid var(--border);
+  padding: 6px 10px;
+  border-radius: 999px;
 }
-.tint-a .catIcon{ box-shadow: 0 0 0 6px rgba(59,130,246,.12) inset; }
-.catCard.tint-b .catIcon{ box-shadow: 0 0 0 6px rgba(236,72,153,.12) inset; }
-.catCard.tint-c .catIcon{ box-shadow: 0 0 0 6px rgba(34,197,94,.12) inset; }
-.catCard.tint-d .catIcon{ box-shadow: 0 0 0 6px rgba(245,158,11,.12) inset; }
-
-.catCard.tint-a{ background: linear-gradient(135deg, rgba(59,130,246,.25), rgba(15,23,42,.92)); }
-.catCard.tint-b{ background: linear-gradient(135deg, rgba(236,72,153,.24), rgba(15,23,42,.92)); }
-.catCard.tint-c{ background: linear-gradient(135deg, rgba(34,197,94,.22), rgba(15,23,42,.92)); }
-.catCard.tint-d{ background: linear-gradient(135deg, rgba(245,158,11,.22), rgba(15,23,42,.92)); }
 
 /* Footer */
 .footer{
@@ -838,7 +809,7 @@ img.img-fallback{
   .searchbar{ width: 100%; max-width: 680px; }
   .headbtns{ width: 100%; justify-content:center; }
   .navbtn{ flex: 1 1 0; min-width: 0; max-width: 250px; }
-  .iconpill{ width: 44px; height: 44px; }
+  .iconpill{ width: 38px; height: 38px; }
 
   /* tarjetas más compactas en móvil (2 por fila) */
   .card-media img{ aspect-ratio: 1 / 1; }

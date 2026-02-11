@@ -723,12 +723,23 @@ async function postUpdateProduct(adminKey, product){
     form.set("action", "updateProduct");
     form.set("adminKey", adminKey);
     form.set("product", JSON.stringify(product));
-    const json = await fetchJSON(base, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
-      body: form.toString(),
-    });
-    return json;
+    try{
+      const json = await fetchJSON(base, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+        body: form.toString(),
+      });
+      return json;
+    }catch(err2){
+      // Último recurso: enviar sin leer respuesta (evita CORS/redirect que causan "Failed to fetch")
+      await fetch(base, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+        body: form.toString(),
+      });
+      return { ok: true, opaque: true };
+    }
   }
 }
 
@@ -1006,7 +1017,8 @@ function adminInit(){
     try{
       const res = await postUpdateProduct(adminKey, data);
       if(res && res.ok){
-        toast("Guardado ✅");
+        // Si fue no-cors, no podemos leer respuesta. Verificamos recargando lista.
+        toast(res.opaque ? "Guardado ✅ (verificando…)" : "Guardado ✅");
         closeEditor();
         await reload();
       }else{
@@ -1014,7 +1026,19 @@ function adminInit(){
       }
     }catch(err){
       console.error(err);
-      toast("Error: " + (err.message||err));
+      const msg = (err && err.message) ? err.message : String(err);
+      if(/Failed to fetch/i.test(msg)){
+        toast(
+          "Error de conexión con Apps Script (Failed to fetch).\n\n"+
+          "Probá esto:\n"+
+          "1) Revisá que tu Web App esté desplegada con 'Acceso: Cualquiera'.\n"+
+          "2) Usá la URL que termina en /exec.\n"+
+          "3) Si acabas de editar el Apps Script, volvé a DESPLEGAR (nueva versión).\n\n"+
+          "Nota: desde GitHub Pages a veces el navegador bloquea leer respuestas POST; por eso este admin verifica recargando la lista."
+        );
+      }else{
+        toast("Error: " + msg);
+      }
     }finally{
       saveBtn.disabled = false;
       saveBtn.textContent = "Guardar";
