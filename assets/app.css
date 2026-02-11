@@ -576,18 +576,30 @@ select.input{cursor:pointer}
 .catCard:hover{ transform: translateY(-1px); }
 .catL{ display:flex; align-items:center; gap:12px; }
 .catIcon{
-  width: 44px; height: 44px; border-radius: 14px;
+  width: 46px; height: 46px; border-radius: 14px;
   display:flex; align-items:center; justify-content:center;
-  font-size: 22px;
   background: rgba(255,255,255,.08);
   border:1px solid rgba(255,255,255,.10);
+  color: rgba(255,255,255,.92);
+}
+.catIcon img{
+  width: 26px; height: 26px;
+  display:block;
+  filter: drop-shadow(0 8px 14px rgba(0,0,0,.18));
 }
 .catTxt{ display:flex; flex-direction:column; gap:2px; }
 .catName{ font-weight: 950; letter-spacing:.2px; }
 .catHint{ font-size: 12px; color: rgba(229,231,235,.75); }
 .catR{ display:flex; flex-direction:column; align-items:flex-end; }
 .catCount{ font-size: 12px; color: rgba(229,231,235,.85); font-weight: 850; }
-.catCard.tint-a .catIcon{ box-shadow: 0 0 0 6px rgba(59,130,246,.12) inset; }
+.catCard
+/* Iconos en modo claro */
+.light .catIcon{
+  background: rgba(15,23,42,.06);
+  border-color: rgba(15,23,42,.10);
+  color: rgba(15,23,42,.85);
+}
+.tint-a .catIcon{ box-shadow: 0 0 0 6px rgba(59,130,246,.12) inset; }
 .catCard.tint-b .catIcon{ box-shadow: 0 0 0 6px rgba(236,72,153,.12) inset; }
 .catCard.tint-c .catIcon{ box-shadow: 0 0 0 6px rgba(34,197,94,.12) inset; }
 .catCard.tint-d .catIcon{ box-shadow: 0 0 0 6px rgba(245,158,11,.12) inset; }

@@ -8,8 +8,9 @@ window.SDCO_DEFAULTS = {
   SHORT_NAME: "SDComayagua",
   WHATSAPP_DISPLAY: "+504 3151-7755",
   WHATSAPP_NUMBER: "50431517755",
-  // Cambia esto si tu Apps Script es otro
-  API_BASE_DEFAULT: "https://script.google.com/macros/s/AKfycbya37aSm80xgzd7mh4mG87_gRZzvl55xl4gt3X5hyCPvUeDg6chLJq7Qn97n_aqS3nI/exec",
+  // ⚠️ IMPORTANTE: este debe ser el *NUEVO* WebApp (Deploy) que soporta doPost (guardar desde Admin).
+  // Pegá aquí tu URL que termina en /exec
+  API_BASE_DEFAULT: "PASTE_YOUR_NEW_WEBAPP_EXEC_URL_HERE",
   CURRENCY: "Lps.",
   LOCALE: "es-HN",
   THEME_DEFAULT: "light" // light | dark

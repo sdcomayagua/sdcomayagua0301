@@ -88,17 +88,23 @@ function shareIcon(){
 /* ---------------- Category visuals ---------------- */
 function categoryVisual(name){
   const n = String(name||"").toLowerCase();
-  // emoji fallback (lightweight, no extra images)
-  if(n.includes("celular")) return { emoji:"📱", tint:"tint-a" };
-  if(n.includes("gamer") || n.includes("gaming")) return { emoji:"🎮", tint:"tint-b" };
-  if(n.includes("hogar")) return { emoji:"🏠", tint:"tint-c" };
-  if(n.includes("cocina")) return { emoji:"🍳", tint:"tint-c" };
-  if(n.includes("tecnolog")) return { emoji:"💻", tint:"tint-a" };
-  if(n.includes("veh") || n.includes("moto")) return { emoji:"🏍️", tint:"tint-d" };
-  if(n.includes("audio") || n.includes("aud")) return { emoji:"🎧", tint:"tint-b" };
-  if(n.includes("almacen") || n.includes("usb") || n.includes("micro")) return { emoji:"💾", tint:"tint-a" };
-  return { emoji:"🛍️", tint:"tint-a" };
+  // Iconos (SVG) por categoría (assets/cat-icons)
+  const pick = (file, tint)=>({ icon:`assets/cat-icons/${file}.svg`, tint:tint||"tint-a" });
+
+  if(n.includes("celular")) return pick("celulares","tint-a");
+  if(n.includes("gamer") || n.includes("gaming")) return pick("gamer","tint-b");
+  if(n.includes("hogar")) return pick("hogar","tint-c");
+  if(n.includes("cocina")) return pick("cocina","tint-c");
+  if(n.includes("tecnolog")) return pick("tecnologia","tint-a");
+  if(n.includes("veh") || n.includes("moto")) return pick("vehiculos","tint-d");
+  if(n.includes("audio") || n.includes("aud")) return pick("audio","tint-b");
+  if(n.includes("almacen") || n.includes("usb") || n.includes("micro") || n.includes("memoria")) return pick("almacenamiento","tint-a");
+  if(n.includes("accesor")) return pick("accesorios","tint-a");
+
+  if(name==="Todos") return pick("todo","tint-a");
+  return pick("general","tint-a");
 }
+
 
 /* ---------------- Data: products ---------------- */
 function cryptoId(){
@@ -476,7 +482,7 @@ Link del producto: ${url.toString()}
       const countText = `${o.count} ${o.count===1?"producto":"productos"}`;
       return `<button class="catCard ${active?"active":""} ${v.tint}" data-cat="${encodeURIComponent(o.name)}" type="button">
         <div class="catL">
-          <div class="catIcon" aria-hidden="true">${v.emoji}</div>
+          <div class="catIcon" aria-hidden="true"><img src="${v.icon}" alt="" loading="lazy" decoding="async"></div>
           <div class="catTxt">
             <div class="catName">${escapeHtml(o.name)}</div>
             <div class="catHint">Toca para ver</div>
@@ -956,9 +962,25 @@ function adminInit(){
     for(const [k,v] of fd.entries()){
       data[k] = String(v ?? "");
     }
-    // coerce
-    data.precio = Number(data.precio || 0);
-    data.stock = Number(data.stock || 0);
+
+    // coerce (no romper si el usuario solo quiere cambiar stock)
+    const parseNum = (val)=>{
+      const s = String(val ?? "").trim();
+      if(!s) return null;
+      const cleaned = s.replace(/[^0-9.]/g, "");
+      if(!cleaned) return null;
+      const n = Number(cleaned);
+      return Number.isFinite(n) ? n : null;
+    };
+
+    const precioParsed = parseNum(data.precio);
+    const stockParsed  = parseNum(data.stock);
+
+    // Si el campo quedó vacío, mantenemos el valor original del producto (para no sobrescribir con 0)
+    const orig = (current && (current.raw || current)) ? (current.raw || current) : null;
+    data.precio = (precioParsed !== null) ? precioParsed : Number(orig?.precio ?? 0);
+    data.stock  = (stockParsed  !== null) ? Math.max(0, Math.floor(stockParsed)) : Number(orig?.stock ?? 0);
+
     data.activo = String(data.activo || "1");
     // ensure ID
     data.id = data.id || cryptoId();
