@@ -13,8 +13,7 @@
   function $(id){ return document.getElementById(id); }
   function esc(s){ return String(s ?? "").replace(/[&<>"]/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[m])); }
   function norm(s){ return String(s||"").toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu,""); }
-  function fmtLps(n){const num=Number(n);if(!isFinite(num))return "";return CFG.CURRENCY+" "+new Intl.NumberFormat(CFG.LOCALE,{maximumFractionDigits:0}).format(num);}).format(num).replace("HNL", CFG.CURRENCY);
-  }
+  function fmtLps(n){const num=Number(n);if(!isFinite(num))return "";return CFG.CURRENCY+" "+new Intl.NumberFormat(CFG.LOCALE,{maximumFractionDigits:0}).format(num);}
   function isSeparator(p){
     const id = String(p.id||"");
     const name = String(p.nombre||"");
@@ -60,13 +59,7 @@
     clearTimeout(toast._id);
     toast._id = setTimeout(() => t.classList.remove("toast--show"), 2600);
   }
-  function setStatus(visible, title, sub, canRetry){
-    els.status.hidden = !visible;
-    els.grid.hidden = visible;
-    els.btnRetry.hidden = !canRetry;
-    if (title) els.status.querySelector(".status__title").textContent = title;
-    if (sub) $("#statusSub").textContent = sub;
-  }
+  function setStatus(visible,title,sub,canRetry,apiUrl){els.status.hidden=!visible;els.grid.hidden=visible;els.btnRetry.hidden=!canRetry;if(els.btnTestApi)els.btnTestApi.hidden=!canRetry;if(title)els.status.querySelector(".status__title").textContent=title;if(sub)$("#statusSub").textContent=sub;if(els.statusApi){els.statusApi.textContent=apiUrl?("API: "+apiUrl):"";}if(els.btnTestApi&&apiUrl){els.btnTestApi.href=apiUrl;}}
   function setTheme(theme){
     state.theme = theme === "light" ? "light" : "dark";
     document.documentElement.setAttribute("data-theme", state.theme);
