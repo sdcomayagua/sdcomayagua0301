@@ -5,7 +5,7 @@ body { font-family: Arial, sans-serif; background: #fff; color: #333; transition
 body.dark { background: #121212; color: #fff; }
 
 /* Header */
-header { padding: 10px; text-align: center; }
+header { padding: 10px; text-align: center; position: sticky; top: 0; z-index: 10; }
 .logo-container { margin-bottom: 10px; }
 .logo { max-width: 150px; height: auto; }
 .search-bar { margin-bottom: 10px; }
@@ -17,194 +17,64 @@ button { padding: 8px 16px; border: none; background: #007bff; color: white; bor
 
 /* Product Grid */
 .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px; }
-.product-card { background: #f9f9f9; border-radius: 8px; overflow: hidden; cursor: pointer; position: relative; }
-.product-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
-.product-card h3 { padding: 5px; font-size: 14px; text-align: center; }
-.stock-badge { position: absolute; top: 5px; right: 5px; background: green; color: white; padding: 2px 5px; font-size: 12px; border-radius: 4px; }
-.no-stock { background: red; }
-.share-icon { position: absolute; bottom: 5px; right: 5px; font-size: 16px; cursor: pointer; }
+.product-card { background: #f9f9f9; border-radius: 12px; overflow: hidden; cursor: pointer; position: relative; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 4px 15px rgba(0,0,0,0.08); opacity: 0; transform: translateY(30px); animation: cardFadeIn 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
+@keyframes cardFadeIn { to { opacity: 1; transform: translateY(0); } }
+body.dark .product-card { background: #1e1e1e; box-shadow: 0 4px 25px rgba(0,0,0,0.4); }
+.product-card:hover { transform: translateY(-8px) scale(1.04); box-shadow: 0 16px 40px rgba(0,0,0,0.15); }
+.product-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; transition: transform 0.6s ease; }
+.product-card:hover img { transform: scale(1.12); }
+.product-card h3 { padding: 8px 5px 5px; font-size: 14px; text-align: center; margin: 0; }
+.stock-badge { position: absolute; top: 8px; right: 8px; background: #28a745; color: white; padding: 4px 8px; font-size: 12px; border-radius: 12px; font-weight: bold; }
+.no-stock { background: #dc3545; }
+.share-icon { position: absolute; bottom: 8px; right: 8px; font-size: 20px; color: #666; cursor: pointer; background: rgba(255,255,255,0.7); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
 
 /* Modals */
-.modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background: rgba(0,0,0,0.5); }
-.modal-content { background: white; margin: 5% auto; padding: 20px; border-radius: 8px; width: 90%; max-height: 90vh; overflow-y: auto; }
+.modal { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.6); backdrop-filter: blur(0); transition: backdrop-filter 0.5s ease, opacity 0.5s ease; opacity: 0; visibility: hidden; }
+.modal[style*="display: block"] { opacity: 1; visibility: visible; backdrop-filter: blur(8px); }
+.modal-content { background: white; margin: 4vh auto; padding: 20px; border-radius: 16px; width: 92%; max-width: 900px; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); transform: scale(0.85) translateY(40px); opacity: 0; transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); }
 body.dark .modal-content { background: #1e1e1e; }
-.close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
-.categories-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-.category-card { background: #f0f0f0; padding: 10px; text-align: center; border-radius: 8px; cursor: pointer; }
+.modal[style*="display: block"] .modal-content { opacity: 1; transform: scale(1) translateY(0); }
+.close { color: #aaa; float: right; font-size: 36px; font-weight: bold; cursor: pointer; line-height: 0.8; }
+
+/* Categories */
+.categories-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.category-card { background: #f0f0f0; padding: 16px; text-align: center; border-radius: 12px; cursor: pointer; transition: all 0.35s ease; font-size: 1.1em; }
 body.dark .category-card { background: #333; }
+.category-card:hover { transform: translateY(-6px) scale(1.06); box-shadow: 0 12px 30px rgba(0,0,0,0.15); }
 
-/* Product Modal */
+/* Product Modal - Gallery Animations */
 .product-details { text-align: center; }
-.main-image { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
-.thumbnails { display: flex; justify-content: center; gap: 5px; margin-top: 10px; }
-.thumbnail { width: 50px; height: 50px; object-fit: cover; cursor: pointer; }
-.product-actions { display: flex; justify-content: center; gap: 10px; position: sticky; bottom: 0; background: inherit; padding: 10px; }
-.primary-btn { background: #25D366; color: white; }
+.product-gallery { margin-bottom: 20px; }
+.main-image { width: 100%; max-width: 500px; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); transition: opacity 0.5s ease, transform 0.5s ease; opacity: 0; transform: scale(0.95); }
+.main-image.loaded { opacity: 1; transform: scale(1); }
+.thumbnails { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 16px; }
+.thumbnail { width: 70px; height: 70px; object-fit: cover; border-radius: 10px; cursor: pointer; border: 3px solid transparent; transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); opacity: 0; transform: translateY(15px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.thumbnail.active { border-color: #25D366; transform: scale(1.12); box-shadow: 0 8px 25px rgba(37, 213, 102, 0.3); }
+.thumbnail:hover:not(.active) { transform: scale(1.08) translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+.thumbnail.loaded { opacity: 1; transform: translateY(0); }
 
-/* Admin */
-.admin-product-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
-.admin-product-card { background: #f9f9f9; padding: 10px; border-radius: 8px; }
-body.dark .admin-product-card { background: #333; }
-.admin-actions { display: flex; justify-content: space-between; margin-top: 10px; }
-.admin-actions button { flex: 1; margin: 0 5px; }
+/* Product info */
+.product-actions { display: flex; justify-content: center; gap: 16px; position: sticky; bottom: 0; background: inherit; padding: 16px 0; border-top: 1px solid #eee; margin-top: 20px; }
+.primary-btn { background: #25D366; color: white; padding: 12px 28px; font-size: 1.1em; border-radius: 50px; box-shadow: 0 4px 15px rgba(37,213,102,0.3); transition: all 0.3s ease; position: relative; overflow: hidden; }
+.primary-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(37,213,102,0.5); }
 
-/* Loading */
-.loading { text-align: center; padding: 20px; }
+/* Header shadow on scroll */
+header.scrolled { box-shadow: 0 4px 20px rgba(0,0,0,0.12); background: rgba(255,255,255,0.96); backdrop-filter: blur(12px); transition: all 0.4s ease; }
+body.dark header.scrolled { background: rgba(18,18,18,0.96); }
 
-/* PC Media Query */
+/* Other animations (from previous) */
+main, .product-grid { animation: fadeInUp 0.8s cubic-bezier(0.22, 0.61, 0.36, 1) forwards; animation-delay: 0.2s; opacity: 0; transform: translateY(20px); }
+@keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+.stock-badge.no-stock { animation: pulseLowStock 2s infinite; }
+@keyframes pulseLowStock { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+#themeToggleBtn { transition: transform 0.5s ease; }
+#themeToggleBtn:hover { transform: rotate(30deg) scale(1.15); }
+
+/* PC adjustments */
 @media (min-width: 768px) {
     .product-grid { grid-template-columns: repeat(4, 1fr); }
     .categories-grid { grid-template-columns: repeat(4, 1fr); }
-    .modal-content { width: 60%; }
+    .modal-content { width: 80%; max-width: 1000px; }
     .admin-product-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-/* ----- Premium Animations & Transitions ----- */
-
-/* Smooth page load - fade in main content */
-main, .product-grid {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 0.8s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
-  animation-delay: 0.2s;
-}
-
-@keyframes fadeInUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Product Card - Premium hover effect */
-.product-card {
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); /* overshoot para feeling premium */
-  transform: scale(1);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-  overflow: hidden;
-  border-radius: 12px;
-  background: var(--card-bg, #ffffff);
-  opacity: 0;
-  transform: translateY(30px);
-  animation: cardFadeIn 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-}
-
-@keyframes cardFadeIn {
-  to { opacity: 1; transform: translateY(0); }
-}
-
-body.dark .product-card {
-  background: var(--card-bg, #1e1e1e);
-  box-shadow: 0 4px 25px rgba(0,0,0,0.4);
-}
-
-.product-card:hover {
-  transform: translateY(-8px) scale(1.04);
-  box-shadow: 0 16px 40px rgba(0,0,0,0.15);
-}
-
-.product-card img {
-  transition: transform 0.6s ease;
-}
-
-.product-card:hover img {
-  transform: scale(1.12);
-}
-
-/* Stock badge pulse when low stock */
-.stock-badge.no-stock {
-  animation: pulseLowStock 2s infinite;
-}
-
-@keyframes pulseLowStock {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-}
-
-/* Modal premium open animation */
-.modal {
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.5s ease, visibility 0.5s ease;
-  backdrop-filter: blur(0px);
-}
-
-.modal[style*="display: block"] {
-  opacity: 1;
-  visibility: visible;
-  backdrop-filter: blur(8px);
-}
-
-.modal-content {
-  opacity: 0;
-  transform: scale(0.85) translateY(30px);
-  transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.modal[style*="display: block"] .modal-content {
-  opacity: 1;
-  transform: scale(1) translateY(0);
-}
-
-/* Header shadow on scroll (JS lo activa) */
-header.scrolled {
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-  transition: box-shadow 0.4s ease;
-  background: rgba(255,255,255,0.95);
-  backdrop-filter: blur(10px);
-}
-
-body.dark header.scrolled {
-  background: rgba(18,18,18,0.95);
-}
-
-/* Buttons premium feel */
-button, .primary-btn {
-  position: relative;
-  overflow: hidden;
-  transition: all 0.3s ease;
-}
-
-.primary-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(37, 213, 102, 0.4); /* WhatsApp green glow */
-}
-
-.primary-btn::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  background: rgba(255,255,255,0.25);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  transition: width 0.6s ease, height 0.6s ease;
-  pointer-events: none;
-}
-
-.primary-btn:active::after {
-  width: 300px;
-  height: 300px;
-  opacity: 0;
-}
-
-/* Theme toggle rotation */
-#themeToggleBtn {
-  transition: transform 0.5s ease;
-}
-
-#themeToggleBtn:hover {
-  transform: rotate(30deg) scale(1.15);
-}
-
-/* Category cards subtle hover */
-.category-card {
-  transition: all 0.35s ease;
-}
-
-.category-card:hover {
-  transform: translateY(-4px) scale(1.06);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+    .thumbnail { width: 90px; height: 90px; }
 }
