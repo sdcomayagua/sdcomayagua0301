@@ -1,0 +1,104 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDComayagua - Soluciones Digitales Comayagua</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="js/config.js" defer></script>
+    <script src="js/api.js" defer></script>
+    <script src="js/ui.js" defer></script>
+    <script src="js/admin.js" defer></script>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="assets/logo.png" alt="SDComayagua Logo" class="logo">
+        </div>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Buscar productos...">
+        </div>
+        <nav class="header-buttons">
+            <button id="categoriesBtn">Categorías</button>
+            <button id="adminBtn">Admin</button>
+            <button id="themeToggleBtn" class="icon-btn">🌙</button>
+        </nav>
+    </header>
+    <main>
+        <div id="productGrid" class="product-grid"></div>
+        <div id="loading" class="loading">Cargando...</div>
+    </main>
+
+    <!-- Modal for Categories -->
+    <div id="categoriesModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Categorías</h2>
+            <div id="categoriesGrid" class="categories-grid"></div>
+        </div>
+    </div>
+
+    <!-- Modal for Product Details -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="product-details">
+                <div class="product-gallery">
+                    <img id="mainImage" src="" alt="Producto" class="main-image">
+                    <div class="thumbnails"></div>
+                </div>
+                <h2 id="productName"></h2>
+                <p id="productCategory"></p>
+                <p id="productPrice"></p>
+                <p id="productStock"></p>
+                <p id="productDescription"></p>
+                <div class="product-actions">
+                    <button id="buyWhatsAppBtn" class="primary-btn">Comprar por WhatsApp</button>
+                    <button id="shareBtn" class="icon-btn">🔗</button>
+                    <button id="videoBtn" class="secondary-btn" style="display:none;">Ver video</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Admin Login -->
+    <div id="adminLoginModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Iniciar Sesión Admin</h2>
+            <input type="password" id="adminKeyInput" placeholder="Clave Admin">
+            <button id="loginAdminBtn">Ingresar</button>
+        </div>
+    </div>
+
+    <!-- Modal for Admin Panel -->
+    <div id="adminPanelModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Panel Admin</h2>
+            <div id="adminProductGrid" class="admin-product-grid"></div>
+        </div>
+    </div>
+
+    <!-- Modal for Edit Product -->
+    <div id="editProductModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Editar Producto</h2>
+            <form id="editProductForm">
+                <!-- Form fields will be dynamically added here -->
+            </form>
+            <button id="saveProductBtn">Guardar</button>
+            <p id="adminMessage"></p>
+        </div>
+    </div>
+
+    <script>
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => {
+            initApp();
+        });
+    </script>
+</body>
+</html>
