@@ -56,8 +56,12 @@
       <div class="status__text">
         <div class="status__title">Cargando catálogo…</div>
         <div class="status__sub" id="statusSub">Conectando con el servidor</div>
+        <div class="status__sub" id="statusApi"></div>
       </div>
-      <button class="btn btn--ghost" id="btnRetry" hidden>Reintentar</button>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center">
+        <button class="btn btn--ghost" id="btnRetry" hidden>Reintentar</button>
+        <a class="btn btn--ghost" id="btnTestApi" href="#" target="_blank" rel="noopener" hidden>Probar API</a>
+      </div>
     </section>
 
     <section id="grid" class="grid" hidden></section>
