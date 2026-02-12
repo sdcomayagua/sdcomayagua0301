@@ -139,3 +139,5 @@ html[data-theme="light"] .card__badge{ background:rgba(255,255,255,0.65);color:r
 .toast--show{display:block}
 .toast__title{font-weight:900}
 .toast__msg{color:var(--muted);font-size:13px;margin-top:2px}
+#statusApi{word-break:break-all;opacity:.9}
+
