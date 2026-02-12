@@ -17,12 +17,12 @@ function renderProducts(filteredProducts = products) {
     filteredProducts.forEach((prod, index) => {
         const card = document.createElement('div');
         card.classList.add('product-card');
-        card.style.animationDelay = `${index * 0.08}s`; // secuencial
+        card.style.animationDelay = `${index * 0.08}s`;
         card.innerHTML = `
             <img src="${prod.imagenes[0] || CONFIG.PLACEHOLDER_IMAGE}" alt="${prod.nombre}" onerror="this.src='${CONFIG.PLACEHOLDER_IMAGE}'">
             <h3>${prod.nombre}</h3>
             <span class="stock-badge ${prod.stock > 0 ? '' : 'no-stock'}">${prod.stock > 0 ? 'Disponible' : 'Sin stock'}</span>
-            <span class="share-icon" onclick="shareProduct('${prod.id}')">🔗</span>
+            <span class="share-icon" onclick="event.stopPropagation(); shareProduct('${prod.id}')">🔗</span>
         `;
         card.onclick = () => openProductModal(prod);
         grid.appendChild(card);
@@ -64,27 +64,43 @@ function openProductModal(prod) {
     document.getElementById('productCategory').textContent = `${prod.categoria} / ${prod.subcategoria || ''}`;
     document.getElementById('productPrice').textContent = `${CONFIG.CURRENCY} ${prod.precio}`;
     document.getElementById('productStock').textContent = `Stock: ${prod.stock}`;
-    document.getElementById('productDescription').textContent = prod.descripcion;
+    document.getElementById('productDescription').textContent = prod.descripcion || 'Sin descripción detallada.';
+
     const mainImg = document.getElementById('mainImage');
+    mainImg.classList.remove('loaded');
     mainImg.src = prod.imagenes[0] || CONFIG.PLACEHOLDER_IMAGE;
-    const thumbs = document.querySelector('.thumbnails');
-    thumbs.innerHTML = '';
-    prod.imagenes.forEach((img, i) => {
+    mainImg.onload = () => mainImg.classList.add('loaded');
+
+    const thumbsContainer = document.querySelector('.thumbnails');
+    thumbsContainer.innerHTML = '';
+    (prod.imagenes.length ? prod.imagenes : [CONFIG.PLACEHOLDER_IMAGE]).forEach((imgSrc, index) => {
         const thumb = document.createElement('img');
         thumb.classList.add('thumbnail');
-        thumb.src = img;
-        thumb.onclick = () => mainImg.src = img;
-        thumbs.appendChild(thumb);
+        thumb.src = imgSrc;
+        thumb.alt = `Miniatura ${index + 1}`;
+        thumb.style.animationDelay = `${index * 0.1}s`;
+        thumb.classList.add('loaded'); // Para activar animación de entrada
+        thumb.onclick = () => {
+            mainImg.classList.remove('loaded');
+            mainImg.src = imgSrc;
+            mainImg.onload = () => mainImg.classList.add('loaded');
+            document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+            thumb.classList.add('active');
+        };
+        if (index === 0) thumb.classList.add('active');
+        thumbsContainer.appendChild(thumb);
     });
+
     document.getElementById('buyWhatsAppBtn').onclick = () => buyOnWhatsApp(prod);
     document.getElementById('shareBtn').onclick = () => shareProduct(prod.id);
     const videoBtn = document.getElementById('videoBtn');
     if (prod.video_url) {
-        videoBtn.style.display = 'block';
+        videoBtn.style.display = 'inline-block';
         videoBtn.onclick = () => window.open(prod.video_url, '_blank');
     } else {
         videoBtn.style.display = 'none';
     }
+
     openModal('productModal');
     history.pushState(null, '', `?product=${prod.id}`);
 }
@@ -96,7 +112,7 @@ function buyOnWhatsApp(prod) {
 
 function shareProduct(id) {
     const url = `${window.location.origin}${window.location.pathname}?product=${id}`;
-    navigator.clipboard.writeText(url).then(() => alert('Link copiado!'));
+    navigator.clipboard.writeText(url).then(() => alert('¡Enlace copiado al portapapeles!'));
 }
 
 function openModal(id) {
@@ -108,40 +124,40 @@ function closeModal(id) {
 }
 
 function showMessage(msg, type = 'info') {
-    // Simple alert for now
-    alert(msg);
+    alert(msg); // Puedes mejorar con un toast más adelante
 }
 
 function toggleTheme() {
     document.body.classList.toggle('dark');
-    const btn = document.getElementById('themeToggleBtn');
-    btn.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+    document.getElementById('themeToggleBtn').textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
 }
 
 async function initApp() {
     document.getElementById('loading').style.display = 'block';
-    [products, taxonomia] = await Promise.all([getProducts(), getTaxonomia()]);
-    renderProducts();
-    renderCategories();
+    try {
+        [products, taxonomia] = await Promise.all([getProducts(), getTaxonomia()]);
+        renderProducts();
+        renderCategories();
+    } catch (err) {
+        console.error(err);
+        document.getElementById('loading').textContent = 'Error al cargar. Intenta recargar.';
+    }
 
-    // Search
     document.getElementById('searchInput').addEventListener('input', e => {
-        const search = e.target.value.toLowerCase();
-        const filtered = products.filter(p => p.nombre.toLowerCase().includes(search));
+        const term = e.target.value.toLowerCase().trim();
+        const filtered = products.filter(p => p.nombre.toLowerCase().includes(term));
         renderProducts(filtered);
     });
 
-    // Buttons
     document.getElementById('categoriesBtn').onclick = () => openModal('categoriesModal');
     document.getElementById('adminBtn').onclick = () => openModal('adminLoginModal');
     document.getElementById('themeToggleBtn').onclick = toggleTheme;
 
-    // Close modals
-    document.querySelectorAll('.close').forEach(close => {
-        close.onclick = () => closeModal(close.parentElement.parentElement.id);
+    document.querySelectorAll('.close').forEach(el => {
+        el.onclick = () => closeModal(el.closest('.modal').id);
     });
 
-    // Check for product param
+    // Deep link product
     const params = new URLSearchParams(window.location.search);
     const prodId = params.get('product');
     if (prodId) {
@@ -149,13 +165,8 @@ async function initApp() {
         if (prod) openProductModal(prod);
     }
 
-    // Header shadow on scroll
+    // Header shadow
     window.addEventListener('scroll', () => {
-      const header = document.querySelector('header');
-      if (window.scrollY > 10) {
-        header.classList.add('scrolled');
-      } else {
-        header.classList.remove('scrolled');
-      }
+        document.querySelector('header').classList.toggle('scrolled', window.scrollY > 20);
     });
 }
