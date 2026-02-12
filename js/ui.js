@@ -14,9 +14,10 @@ function getEmojiForCategory(cat) {
 function renderProducts(filteredProducts = products) {
     const grid = document.getElementById('productGrid');
     grid.innerHTML = '';
-    filteredProducts.forEach(prod => {
+    filteredProducts.forEach((prod, index) => {
         const card = document.createElement('div');
         card.classList.add('product-card');
+        card.style.animationDelay = `${index * 0.08}s`; // secuencial
         card.innerHTML = `
             <img src="${prod.imagenes[0] || CONFIG.PLACEHOLDER_IMAGE}" alt="${prod.nombre}" onerror="this.src='${CONFIG.PLACEHOLDER_IMAGE}'">
             <h3>${prod.nombre}</h3>
@@ -147,4 +148,14 @@ async function initApp() {
         const prod = products.find(p => p.id === prodId);
         if (prod) openProductModal(prod);
     }
+
+    // Header shadow on scroll
+    window.addEventListener('scroll', () => {
+      const header = document.querySelector('header');
+      if (window.scrollY > 10) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    });
 }
