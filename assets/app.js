@@ -70,7 +70,16 @@ function fmtMoney(n){
   return `${cur} ${val.toLocaleString(cfg.LOCALE || "es-HN")}`;
 }
 async function fetchJSON(url, opts){
-  const res = await fetch(url, opts);
+  const o = opts ? {...opts} : {};
+  const method = String(o.method||"GET").toUpperCase();
+
+  // Evitar cache (GitHub Pages + móviles a veces cachean fuerte)
+  if(method === "GET"){
+    o.cache = "no-store";
+    o.headers = { ...(o.headers||{}), "Cache-Control":"no-cache" };
+  }
+
+  const res = await fetch(url, o);
   const txt = await res.text();
   let json = null;
   try{ json = JSON.parse(txt); }catch{}
@@ -78,6 +87,7 @@ async function fetchJSON(url, opts){
   if(json === null) throw new Error("Respuesta no-JSON del backend");
   return json;
 }
+
 function shareIcon(){
   return `
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -87,23 +97,27 @@ function shareIcon(){
 
 /* ---------------- Category visuals ---------------- */
 function categoryVisual(name){
-  const n = String(name||"").toLowerCase();
-  // Iconos (SVG) por categoría (assets/cat-icons)
-  const pick = (file, tint)=>({ icon:`assets/cat-icons/${file}.svg`, tint:tint||"tint-a" });
+  const n = String(name||"").toLowerCase().trim();
 
-  if(n.includes("celular")) return pick("celulares","tint-a");
-  if(n.includes("gamer") || n.includes("gaming")) return pick("gamer","tint-b");
-  if(n.includes("hogar")) return pick("hogar","tint-c");
-  if(n.includes("cocina")) return pick("cocina","tint-c");
-  if(n.includes("tecnolog")) return pick("tecnologia","tint-a");
-  if(n.includes("veh") || n.includes("moto")) return pick("vehiculos","tint-d");
-  if(n.includes("audio") || n.includes("aud")) return pick("audio","tint-b");
-  if(n.includes("almacen") || n.includes("usb") || n.includes("micro") || n.includes("memoria")) return pick("almacenamiento","tint-a");
-  if(n.includes("accesor")) return pick("accesorios","tint-a");
+  // Emojis "por defecto" (no necesitás editar código cuando agregues categorías nuevas)
+  const pool = ["🛍️","🎮","📱","💻","🏠","🍳","🎧","🔌","🚗","🛵","📺","🧰","💡","🕹️","⌚","🎁","📦","🧼","🪑","🧊","🔋","🖥️"];
+  const hash = (s)=>{ let h=0; for(let i=0;i<s.length;i++){ h=((h<<5)-h)+s.charCodeAt(i); h|=0; } return Math.abs(h); };
 
-  if(name==="Todos") return pick("todo","tint-a");
-  return pick("general","tint-a");
+  // Algunas categorías típicas (mejor “match” visual)
+  if(n.includes("gamer")||n.includes("gaming")) return { emoji:"🎮", tint:"tint-b" };
+  if(n.includes("cel")||n.includes("móv")||n.includes("movil")||n.includes("tel")) return { emoji:"📱", tint:"tint-a" };
+  if(n.includes("pc")||n.includes("comput")||n.includes("laptop")) return { emoji:"💻", tint:"tint-a" };
+  if(n.includes("hogar")) return { emoji:"🏠", tint:"tint-c" };
+  if(n.includes("cocina")) return { emoji:"🍳", tint:"tint-c" };
+  if(n.includes("audio")||n.includes("aud")) return { emoji:"🎧", tint:"tint-b" };
+  if(n.includes("cable")||n.includes("carg")||n.includes("power")) return { emoji:"🔌", tint:"tint-a" };
+  if(n.includes("veh")||n.includes("moto")||n.includes("car")) return { emoji:"🚗", tint:"tint-c" };
+
+  // Fallback automático
+  const idx = hash(n||"cat") % pool.length;
+  return { emoji: pool[idx], tint:"tint-a" };
 }
+
 
 
 /* ---------------- Data: products ---------------- */
@@ -174,7 +188,7 @@ function normalizeProd(p){
 async function fetchProducts(){
   const base = apiBase();
   if(!base) throw new Error("API_BASE vacío (assets/config.js)");
-  const url = `${base}?only=productos`;
+  const url = `${base}?only=productos&_=${Date.now()}`;
   const json = await fetchJSON(url);
   return Array.isArray(json.productos) ? json.productos : [];
 }
@@ -469,29 +483,19 @@ Link del producto: ${url.toString()}
   }
 
   function renderCatModal(){
-    const entries = Array.from(state.cats.entries())
-      .sort((a,b)=> b[1].count-a[1].count || a[0].localeCompare(b[0],"es"));
-
-    const items = [
-      {name:"Todos", count: state.all.length}
-      ,...entries.map(([name, info])=>({name, count: info.count}))
-    ];
+    if(!els.catList) return;
+    const items = buildCatList();
     els.catList.innerHTML = items.map(o=>{
       const v = categoryVisual(o.name);
-      const active = (o.name==="Todos" && state.activeCat==="Todos") || (o.name===state.activeCat);
-      const countText = `${o.count} ${o.count===1?"producto":"productos"}`;
-      return `<button class="catCard ${active?"active":""} ${v.tint}" data-cat="${encodeURIComponent(o.name)}" type="button">
-        <div class="catL">
-          <div class="catIcon" aria-hidden="true"><img src="${v.icon}" alt="" loading="lazy" decoding="async"></div>
-          <div class="catTxt">
-            <div class="catName">${escapeHtml(o.name)}</div>
-            <div class="catHint">Toca para ver</div>
+      return `
+        <button class="catCard ${v.tint||""}" data-cat="${encodeURIComponent(o.value)}" type="button">
+          <div class="catL">
+            <div class="catIcon emoji" aria-hidden="true">${v.emoji||"🛍️"}</div>
+            <div class="catTxt">
+              <div class="catName">${escapeHtml(o.name)}</div>
+            </div>
           </div>
-        </div>
-        <div class="catR">
-          <div class="catCount">${countText}</div>
-        </div>
-      </button>`;
+        </button>`;
     }).join("");
 
     $$(".catCard", els.catList).forEach(b=>{
@@ -505,203 +509,6 @@ Link del producto: ${url.toString()}
     });
   }
 
-  function renderPills(){
-    if(!els.pills) return;
-    let subs = [];
-    if(state.activeCat !== "Todos"){
-      const info = state.cats.get(state.activeCat);
-      if(info){
-        subs = Array.from(info.subs.entries())
-          .sort((a,b)=> b[1]-a[1] || a[0].localeCompare(b[0],"es"))
-          .map(([name, count])=>({name, count}));
-      }
-    }
-    const show = subs.length > 0;
-    els.pills.style.display = show ? "flex" : "none";
-    if(!show) return;
-
-    els.pills.innerHTML = [
-      {name:"Todo", count: state.cats.get(state.activeCat)?.count || 0, all:true},
-      ...subs
-    ].map(o=>{
-      const active = (o.all && !state.activeSub) || (!o.all && state.activeSub===o.name);
-      return `<button class="pill ${active?"active":""}" data-sub="${encodeURIComponent(o.all?"":o.name)}" type="button">
-        ${escapeHtml(o.name)} <span class="small">(${o.count})</span>
-      </button>`;
-    }).join("");
-
-    $$(".pill", els.pills).forEach(b=>{
-      b.addEventListener("click", ()=>{
-        state.activeSub = decodeURIComponent(b.getAttribute("data-sub")||"");
-        apply();
-      });
-    });
-  }
-
-  function render(){
-    // title + count
-    const base = state.activeCat === "Todos" ? "Todos los productos" : state.activeCat;
-    const sub = state.activeSub ? ` — ${state.activeSub}` : "";
-    els.catTitle.textContent = base + sub;
-
-    const total = state.all.length;
-    const shown = state.view.length;
-    if(els.countMeta){
-      let extra = "";
-      if(state.quick === "instock") extra = " • Con stock";
-      if(state.quick === "offers") extra = " • Ofertas";
-      els.countMeta.textContent = `Mostrando ${shown} de ${total}${extra}`;
-    }
-
-    renderPills();
-
-    // grid
-    const items = state.view;
-    if(!items.length){
-      els.grid.innerHTML = "";
-      els.empty.style.display = "block";
-      return;
-    }
-    els.empty.style.display = "none";
-
-    els.grid.innerHTML = items.map(p=>{
-      const agotado = p.stock <= 0;
-      const imgRaw = p.imgs?.[0] || "";
-      const img = isProbablyUrl(imgRaw) ? imgRaw : IMG_FALLBACK;
-
-      const badges = [
-        p.offer ? `<div class="badge offer">${escapeHtml(p.offer.badge)}</div>` : "",
-        agotado ? `<div class="badge out">Agotado</div>` : ""
-      ].join("");
-
-      const price = fmtMoney(p.precio_final);
-      const old = (p.offer && p.precio_final !== p.precio_base)
-        ? `<div class="oldPrice">${fmtMoney(p.precio_base)}</div>`
-        : "";
-
-      const stockClass = agotado ? "bad" : "good";
-      const stockText = agotado ? "Sin stock" : `Stock: ${p.stock}`;
-
-      return `
-        <article class="card" data-id="${encodeURIComponent(p.id)}">
-          <button class="card-media" data-open="1" type="button" aria-label="Ver ${escapeHtml(p.nombre)}">
-            <img loading="lazy" src="${img}" data-fallback="${IMG_FALLBACK}" alt="${escapeHtml(p.nombre)}">
-            ${badges}
-          </button>
-
-          <div class="card-body">
-            <h4 class="card-title">${escapeHtml(p.nombre)}</h4>
-            <div class="priceRow">
-              <div class="price">${price}</div>
-              ${old}
-            </div>
-            <div class="stock ${stockClass}">${stockText}</div>
-          </div>
-
-          <div class="card-actions">
-            <button class="btn primary" data-open="1" type="button">Ver detalles</button>
-            <button class="btn icon iconbtn" data-share="1" type="button" title="Compartir" aria-label="Compartir">
-              ${shareIcon()}
-            </button>
-          </div>
-        </article>
-      `;
-    }).join("");
-
-    applyImgFallback(els.grid);
-
-    // events
-    $$(".card [data-open='1']", els.grid).forEach(btn=>{
-      btn.addEventListener("click", ()=>{
-        const id = decodeURIComponent(btn.closest(".card").getAttribute("data-id"));
-        const p = state.all.find(x=>x.id===id);
-        if(p) openModal(p);
-      });
-    });
-    $$(".card [data-share='1']", els.grid).forEach(btn=>{
-      btn.addEventListener("click", (ev)=>{
-        ev.stopPropagation();
-        const id = decodeURIComponent(btn.closest(".card").getAttribute("data-id"));
-        const p = state.all.find(x=>x.id===id);
-        if(p) shareProduct(p);
-      });
-    });
-  }
-
-  function routeFromHash(){
-    const h = location.hash || "";
-    const m = h.match(/p=([^&]+)/);
-    if(m){
-      const id = decodeURIComponent(m[1]);
-      const p = state.all.find(x=>x.id===id);
-      if(p) openModal(p);
-    }
-  }
-
-  async function boot(){
-    applyTheme(); // set theme early
-    els.themeBtn?.addEventListener("click", toggleTheme);
-
-    const cfg = getConfig();
-    if(els.fab){
-      const wa = cfg.WHATSAPP_NUMBER || "50431517755";
-      els.fab.href = `https://wa.me/${wa}`;
-    }
-
-    try{
-      const raw = await fetchProducts();
-      const { list, cats } = buildCatalog(raw);
-      state.all = list;
-      state.cats = cats;
-
-      renderChips();
-      renderCatModal();
-
-      apply();
-      routeFromHash();
-    }catch(err){
-      console.error(err);
-      els.grid.innerHTML = `<div class="empty" style="grid-column:1/-1">
-        <div class="empty-title">No se pudieron cargar productos</div>
-        <div class="small">Revisá tu API_BASE o el Apps Script. Error: ${escapeHtml(String(err.message||err))}</div>
-      </div>`;
-      els.countMeta.textContent = "Error";
-    }
-  }
-
-  // listeners
-  els.qTop?.addEventListener("input", e=> syncSearch(e.target.value));
-  els.q?.addEventListener("input", e=> syncSearch(e.target.value));
-  els.clearSearch?.addEventListener("click", ()=> syncSearch(""));
-
-  els.sort?.addEventListener("change", e=>{ state.sort = e.target.value; apply(); });
-
-  els.adminBtn?.addEventListener("click", ()=> location.href="admin.html");
-  els.catsBtn?.addEventListener("click", openCatModal);
-  els.goCats?.addEventListener("click", openCatModal);
-  els.goAll?.addEventListener("click", ()=>{
-    state.activeCat="Todos"; state.activeSub=""; state.quick="all";
-    renderChips();
-    renderCatModal();
-    apply();
-    toast("Mostrando todo");
-  });
-
-  els.closeModal?.addEventListener("click", closeModal);
-  els.backdrop?.addEventListener("click", (e)=>{ if(e.target === els.backdrop) closeModal(); });
-  els.closeCatModal?.addEventListener("click", ()=>closeCatModal());
-  els.catModal?.addEventListener("click", (e)=>{ if(e.target === els.catModal) closeCatModal(); });
-
-  window.addEventListener("keydown", (e)=>{
-    if(e.key==="Escape"){
-      closeModal();
-      closeCatModal();
-    }
-  });
-  window.addEventListener("hashchange", routeFromHash);
-
-  boot();
-}
 
 /* ---------------- Admin ---------------- */
 async function postUpdateProduct(adminKey, product){
@@ -735,6 +542,8 @@ async function postUpdateProduct(adminKey, product){
       await fetch(base, {
         method: "POST",
         mode: "no-cors",
+        cache: "no-store",
+        keepalive: true,
         headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
         body: form.toString(),
       });
