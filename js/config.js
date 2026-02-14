@@ -9,7 +9,7 @@ window.SDCFG = {
   whatsappNumber: "50431517755",
 
   // ⬇️ Pega aquí tu URL de Web App (deploy) del Apps Script que expone ?only=productos
-  apiBase: "PEGA_TU_WEB_APP_AQUI",
+  apiBase: "https://script.google.com/macros/s/AKfycbwrSyQN6wpropSjTdXc4p6Grnw7fUwWMVLObD_ReV4vt0R07xmLuZWeVZHFwk1YkRRoTA/exec",
 
   // Si Blogger te bloquea CORS, usa JSONP (tu backend v3 ya trae soporte)
   preferJsonp: true,
