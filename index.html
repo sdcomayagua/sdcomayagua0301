@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SD-Comayagua | Catálogo</title>
+  <meta name="description" content="Catálogo de productos - SD-Comayagua" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar__inner">
+      <div class="brand">
+        <div class="brand__mark" aria-hidden="true">SD</div>
+        <div class="brand__text">
+          <div class="brand__short">SD-Comayagua</div>
+          <div class="brand__long">Soluciones Digitales Comayagua</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a class="nav__link nav__link--active" href="#catalogo">Catálogo</a>
+        <a class="nav__link" href="#envios">Envíos</a>
+        <a class="nav__link" href="#soporte">Soporte</a>
+      </nav>
+
+      <div class="topbar__actions">
+        <button id="btnTheme" class="iconbtn" type="button" aria-label="Cambiar tema" title="Cambiar tema">
+          <span class="icon" aria-hidden="true">◐</span>
+        </button>
+        <a id="btnWhatsTop" class="btn btn--primary" href="#" rel="noopener">WhatsApp</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap main">
+    <section id="catalogo" class="hero">
+      <div class="hero__left">
+        <h1 class="hero__title">Catálogo premium</h1>
+        <p class="hero__subtitle">Busca rápido, filtra por categoría y compra directo por WhatsApp.</p>
+      </div>
+      <div class="hero__right">
+        <div class="search">
+          <input id="q" class="search__input" type="search" placeholder="Buscar productos…" autocomplete="off" />
+          <button id="btnClear" class="search__clear" type="button" aria-label="Limpiar" title="Limpiar">✕</button>
+        </div>
+        <div class="controls">
+          <div class="controls__row">
+            <select id="selCat" class="select">
+              <option value="">Todas las categorías</option>
+            </select>
+            <select id="selSub" class="select">
+              <option value="">Todas las subcategorías</option>
+            </select>
+          </div>
+          <div class="controls__row">
+            <select id="selSort" class="select">
+              <option value="relevance">Orden: Relevancia</option>
+              <option value="price_asc">Precio: menor a mayor</option>
+              <option value="price_desc">Precio: mayor a menor</option>
+              <option value="newest">Orden: más nuevos</option>
+            </select>
+            <label class="toggle">
+              <input id="chkInStock" type="checkbox" />
+              <span>Solo disponibles</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="chips" aria-label="Categorías rápidas">
+      <div id="chips" class="chips__inner"></div>
+    </section>
+
+    <section class="grid">
+      <div id="state" class="state" hidden></div>
+      <div id="grid" class="grid__inner"></div>
+    </section>
+
+    <section id="envios" class="info">
+      <h2 class="h2">Envíos</h2>
+      <p class="muted">Configura tus envíos en tu sistema (si lo usas). Esta página está lista para integrarse con tu backend.</p>
+    </section>
+
+    <section id="soporte" class="info">
+      <h2 class="h2">Soporte</h2>
+      <p class="muted">¿Dudas o cotizaciones? Escríbenos por WhatsApp.</p>
+      <a id="btnWhatsSupport" class="btn btn--ghost" href="#" rel="noopener">Abrir WhatsApp</a>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer__inner">
+      <span class="muted">© <span id="year"></span> SD-Comayagua</span>
+      <span class="muted">Hecho para móvil y PC</span>
+    </div>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
